@@ -117,6 +117,38 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col breathing-bg">
 
+    <!-- SYSTEM LOCK OVERLAY (Global) -->
+    <div id="systemLockOverlay" class="fixed inset-0 z-[500] bg-slate-950/95 backdrop-blur-3xl hidden flex-col items-center justify-center transition-all duration-700">
+        <!-- Secret Unlock Trigger -->
+        <div onclick="openSecretModal('unlock')" class="absolute bottom-6 right-6 w-10 h-10 cursor-pointer opacity-0 hover:opacity-100 transition-opacity text-white/50 flex items-center justify-center" title="Admin Override"><i data-lucide="terminal" class="w-6 h-6"></i></div>
+        
+        <div class="relative flex flex-col items-center p-12">
+            <div class="absolute inset-0 bg-red-500/20 blur-[120px] rounded-full pointer-events-none"></div>
+            <i data-lucide="shield-alert" class="w-28 h-28 text-red-500 mb-8 animate-pulse relative z-10"></i>
+            <h1 class="font-heading text-4xl md:text-6xl font-black text-white tracking-widest uppercase mb-4 text-center shadow-black drop-shadow-2xl relative z-10">System Locked</h1>
+            <div class="w-24 h-1.5 bg-red-600 rounded-full mb-8 relative z-10"></div>
+            <p class="text-xl md:text-2xl text-gray-300 mb-4 text-center font-medium max-w-2xl relative z-10">Maintenance in Progress. Authorized Personnel Only.</p>
+            <p class="text-lg md:text-xl text-gray-400 text-center font-sans max-w-2xl relative z-10">ລະບົບຖືກລັອກເພື່ອກວດສອບ. ກະລຸນາກັບມາໃໝ່ພາຍຫຼັງ.</p>
+        </div>
+    </div>
+
+    <!-- SECRET LOCK/UNLOCK OVERRIDE MODAL -->
+    <div id="secretModal" class="fixed inset-0 z-[600] bg-black/80 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-gray-900 rounded-3xl w-[90%] max-w-sm p-8 relative shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300 flex flex-col items-center" id="secretBox">
+            <button onclick="closeSecretModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <i data-lucide="terminal" class="w-12 h-12 text-red-500 mb-4"></i>
+            <h2 class="font-mono text-xl font-bold text-white mb-2 tracking-widest uppercase" id="secretModalTitle">System Override</h2>
+            <p class="text-gray-400 text-xs text-center mb-6 font-mono">Enter authorization code to toggle system state.</p>
+            
+            <input type="password" id="secretPassword" placeholder="••••" class="w-full text-center text-3xl tracking-[0.5em] font-mono border border-gray-700 rounded-xl p-4 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 bg-gray-800 text-white mb-2 transition-all">
+            <p id="secretError" class="text-red-500 font-mono text-xs text-center mb-4 hidden h-4">Error: Invalid Authorization</p>
+            
+            <button onclick="executeSecretAction()" class="w-full bg-red-600 text-white font-bold text-sm py-4 rounded-xl hover:bg-red-700 shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all uppercase tracking-widest">Execute</button>
+        </div>
+    </div>
+
     <!-- FIREBASE INITIAL LOADING OVERLAY -->
     <div id="firebaseLoading" class="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center">
         <i data-lucide="loader-2" class="w-12 h-12 text-brand-blue animate-spin mb-4"></i>
@@ -191,13 +223,10 @@
                     </div>
                 </div>
 
-                <!-- Right Controls: Admin -->
+                <!-- Right Controls: Login -->
                 <div class="flex items-center gap-4">
                     <button onclick="openLoginModal()" id="headerLoginBtn" class="hidden sm:flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide shadow-sm hover:shadow transition-all">
-                        <i data-lucide="shield" class="w-4 h-4 text-brand-blue"></i> Admin Access
-                    </button>
-                    <button onclick="logoutAdmin()" id="headerLogoutBtn" class="hidden sm:flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide shadow-sm hover:shadow transition-all">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                        <i data-lucide="log-in" class="w-4 h-4 text-brand-blue"></i> Login
                     </button>
                 </div>
 
@@ -228,10 +257,10 @@
                     <i id="acc-sib-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
                 </button>
                 <div id="acc-sib" class="hidden pl-12 pr-4 py-2 space-y-1">
-                    <button onclick="loadDeptAndClose('sib_kg', 'Sibounheuang - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
-                    <button onclick="loadDeptAndClose('sib_pri', 'Sibounheuang - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Primary ປະຖົມ</button>
-                    <button onclick="loadDeptAndClose('sib_sec', 'Sibounheuang - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
-                    <button onclick="loadDeptAndClose('sib_eng', 'Sibounheuang - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                    <button onclick="loadDeptAndClose('sib_kg', 'Sibounheuang (ສີບຸນເຮືອງ) - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('sib_pri', 'Sibounheuang (ສີບຸນເຮືອງ) - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('sib_sec', 'Sibounheuang (ສີບຸນເຮືອງ) - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('sib_eng', 'Sibounheuang (ສີບຸນເຮືອງ) - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">English Dept. ອັງກິດ</button>
                 </div>
             </div>
 
@@ -242,10 +271,10 @@
                     <i id="acc-chom-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
                 </button>
                 <div id="acc-chom" class="hidden pl-12 pr-4 py-2 space-y-1">
-                    <button onclick="loadDeptAndClose('chom_kg', 'Chommany - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
-                    <button onclick="loadDeptAndClose('chom_pri', 'Chommany - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Primary ປະຖົມ</button>
-                    <button onclick="loadDeptAndClose('chom_sec', 'Chommany - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
-                    <button onclick="loadDeptAndClose('chom_eng', 'Chommany - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                    <button onclick="loadDeptAndClose('chom_kg', 'Chommany (ຈອມມະນີ) - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('chom_pri', 'Chommany (ຈອມມະນີ) - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('chom_sec', 'Chommany (ຈອມມະນີ) - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('chom_eng', 'Chommany (ຈອມມະນີ) - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">English Dept. ອັງກິດ</button>
                 </div>
             </div>
 
@@ -268,32 +297,40 @@
         <!-- Drawer Footer (Login) -->
         <div class="p-6 border-t border-gray-100 bg-gray-50/50">
             <button onclick="openLoginModalFromMenu()" id="drawerLoginBtn" class="w-full bg-brand-blue text-white py-3.5 rounded-xl font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">
-                <i data-lucide="shield" class="w-4 h-4"></i> Admin Login
-            </button>
-            <button onclick="logoutAdminFromMenu()" id="drawerLogoutBtn" class="hidden w-full bg-white text-red-600 border border-red-100 py-3.5 rounded-xl font-semibold text-sm tracking-wide hover:bg-red-50 transition-all flex justify-center items-center gap-2 shadow-sm">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                <i data-lucide="log-in" class="w-4 h-4"></i> Login
             </button>
         </div>
     </div>
 
-    <!-- ADMIN LOGIN MODAL -->
+    <!-- AESTHETIC LOGIN MODAL -->
     <div id="loginModal" class="fixed inset-0 z-[80] modal-bg flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl w-[90%] max-w-sm p-8 relative shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-300" id="loginBox">
-            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+        <div class="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] w-[90%] max-w-sm p-10 relative shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/60 transform scale-95 transition-transform duration-300 overflow-hidden" id="loginBox">
+            <!-- Decorative Login Orbs -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-blue/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-brand-green/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+            
+            <!-- SECRET SYSTEM LOCK TRIGGER -->
+            <div onclick="openSecretModal('lock')" class="absolute top-4 left-4 w-4 h-4 cursor-pointer opacity-0 hover:opacity-100 transition-opacity bg-red-500 rounded-full shadow-sm flex items-center justify-center" title="System Lockdown">
+                <i data-lucide="lock" class="w-2.5 h-2.5 text-white"></i>
+            </div>
+
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 bg-white/50 hover:bg-white p-2 rounded-full transition-all shadow-sm">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <div class="text-center mb-8 mt-4">
-                <div class="bg-gray-50 text-brand-blue w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-gray-100 shadow-sm">
-                    <i data-lucide="lock" class="w-7 h-7"></i>
+            <div class="text-center mb-8 mt-2 relative z-10">
+                <div class="bg-gradient-to-tr from-brand-blue to-indigo-500 text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg transform hover:scale-105 transition-transform">
+                    <i data-lucide="user-check" class="w-7 h-7"></i>
                 </div>
-                <h2 class="font-heading text-2xl font-bold text-gray-900 tracking-tight">Admin Access</h2>
-                <p class="text-sm text-gray-500 mt-1">Please enter your secure PIN</p>
+                <h2 class="font-heading text-2xl font-black text-gray-900 tracking-tight uppercase">Login</h2>
+                <p class="text-sm text-gray-500 mt-1 font-medium">Please enter your secure PIN</p>
             </div>
-            <input type="password" id="adminPassword" placeholder="••••" class="w-full text-center text-3xl tracking-[0.5em] font-medium border border-gray-200 rounded-xl p-4 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 bg-gray-50 transition-all mb-4">
-            <p id="loginError" class="text-red-500 font-medium text-sm text-center mb-4 hidden bg-red-50 p-3 rounded-lg border border-red-100">Incorrect PIN. Please try again.</p>
-            <button onclick="checkLogin()" class="w-full bg-gray-900 text-white font-semibold text-sm py-4 rounded-xl shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all tracking-wide">
-                Unlock Dashboard
-            </button>
+            <div class="relative z-10">
+                <input type="password" id="adminPassword" placeholder="••••" class="w-full text-center text-3xl tracking-[0.5em] font-medium border border-gray-200/80 rounded-2xl p-4 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 bg-white/60 backdrop-blur-sm transition-all mb-4 shadow-inner">
+                <p id="loginError" class="text-red-500 font-medium text-sm text-center mb-4 hidden bg-red-50 p-3 rounded-xl border border-red-100">Incorrect PIN. Please try again.</p>
+                <button onclick="checkLogin()" class="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold text-sm py-4 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all tracking-widest uppercase">
+                    Authenticate
+                </button>
+            </div>
         </div>
     </div>
 
@@ -326,7 +363,7 @@
                 
                 <!-- Giant Announcement Board -->
                 <div id="homeAnnouncementBlock" class="hidden w-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-[2.5rem] p-1 shadow-elegant relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
-                    <div class="bg-white/95 backdrop-blur-xl rounded-[2.3rem] p-8 md:p-12 relative overflow-hidden h-full flex flex-col md:flex-row items-center gap-8">
+                    <div class="bg-white/95 backdrop-blur-xl rounded-[2.3rem] p-8 md:p-12 relative overflow-hidden h-full flex flex-col items-center justify-center gap-6">
                         <div class="absolute -right-20 -top-20 text-yellow-500/10 pointer-events-none">
                             <i data-lucide="megaphone" class="w-96 h-96"></i>
                         </div>
@@ -335,11 +372,11 @@
                             <i data-lucide="bell-ring" class="w-10 h-10 md:w-14 md:h-14 animate-pulse"></i>
                         </div>
                         
-                        <div class="text-center md:text-left z-10 w-full">
+                        <div class="text-center z-10 w-full flex flex-col items-center">
                             <h2 class="font-heading text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600 tracking-wide mb-1 uppercase">Important Notice Board</h2>
                             <div class="text-orange-500 font-bold text-lg md:text-xl mb-4 tracking-wide">ກະດານແຈ້ງການສຳຄັນ</div>
-                            <div class="w-20 h-1.5 bg-yellow-400 rounded-full mb-6 mx-auto md:mx-0"></div>
-                            <p id="homeAnnouncementText" class="text-lg md:text-xl text-gray-800 font-medium whitespace-pre-line leading-relaxed"></p>
+                            <div class="w-20 h-1.5 bg-yellow-400 rounded-full mb-6 mx-auto"></div>
+                            <p id="homeAnnouncementText" class="text-lg md:text-xl text-gray-800 font-medium whitespace-pre-line leading-relaxed max-w-4xl"></p>
                         </div>
                     </div>
                 </div>
@@ -500,37 +537,51 @@
         </section>
 
         <!-- VIEW: DEPARTMENT -->
-        <section id="view-department" class="view-section py-16 px-4 max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-gray-200/50 pb-8 gap-4 text-center md:text-left">
-                <div>
-                    <span class="text-brand-blue font-semibold tracking-widest uppercase text-xs mb-2 block">Department Roster</span>
-                    <h1 id="deptTitle" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Department Name</h1>
-                </div>
+        <section id="view-department" class="view-section py-16 px-4 relative min-h-screen">
+            <!-- ARTISTIC AESTHETIC BACKGROUND FOR DEPARTMENTS -->
+            <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+                <div class="absolute top-0 right-0 w-[40rem] h-[40rem] bg-gradient-to-bl from-brand-blue/10 via-purple-100/30 to-transparent rounded-full blur-[100px] transform translate-x-1/3 -translate-y-1/4"></div>
+                <div class="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-gradient-to-tr from-brand-green/10 via-teal-100/30 to-transparent rounded-full blur-[100px] transform -translate-x-1/3 translate-y-1/4"></div>
             </div>
 
-            <!-- Aesthetic Staff Grid -->
-            <div id="teacherGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
-                <!-- Teacher Cards -->
-            </div>
-
-            <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant">
-                <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100">
-                    <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
+            <div class="max-w-7xl mx-auto relative z-10">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-gray-200/50 pb-8 gap-4 text-center md:text-left">
+                    <div>
+                        <span class="text-brand-blue font-semibold tracking-widest uppercase text-xs mb-2 block">Department Roster</span>
+                        <h1 id="deptTitle" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Department Name</h1>
+                    </div>
                 </div>
-                <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
-                <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
-                <a id="deptDriveLink" href="#" target="_blank" class="inline-block bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    Open Google Drive
-                </a>
-                <p id="noDriveWarning" class="text-red-500 font-medium text-sm mt-6 hidden bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>
+
+                <!-- Aesthetic Staff Grid -->
+                <div id="teacherGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
+                    <!-- Teacher Cards -->
+                </div>
+
+                <div class="bg-white/80 backdrop-blur-md rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant">
+                    <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100 shadow-sm">
+                        <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
+                    </div>
+                    <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
+                    <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
+                    <a id="deptDriveLink" href="#" target="_blank" class="inline-block bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                        Open Google Drive
+                    </a>
+                    <p id="noDriveWarning" class="text-red-500 font-medium text-sm mt-6 hidden bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>
+                </div>
             </div>
         </section>
 
         <!-- VIEW: ADMIN DASHBOARD -->
         <section id="view-admin" class="view-section py-16 px-4 max-w-7xl mx-auto hidden">
-            <div class="mb-12 border-b border-gray-300 pb-8">
-                <span class="text-brand-green font-semibold tracking-widest uppercase text-xs mb-2 block">Management</span>
-                <h1 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+            <div class="mb-12 border-b border-gray-300 pb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <span class="text-brand-green font-semibold tracking-widest uppercase text-xs mb-2 block">Management</span>
+                    <h1 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+                </div>
+                <!-- LOGOUT BUTTON ONLY VISIBLE HERE -->
+                <button onclick="logoutAdmin()" class="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 px-8 py-3 rounded-full font-bold text-sm tracking-widest shadow-sm hover:shadow transition-all uppercase">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                </button>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -815,6 +866,7 @@
         // --- Data & State ---
         let state = {
             isLoggedIn: false,
+            isLocked: false,
             announcement: '',
             logo: '', 
             events: [], 
@@ -842,12 +894,13 @@
         let editingTeacherId = null;
         let draggedTeacherId = null;
         let announcementShown = false;
+        let currentSecretAction = null;
 
         const deptNames = {
-            sib_kg: 'Sibounheuang - KG', sib_pri: 'Sibounheuang - Primary',
-            sib_sec: 'Sibounheuang - Secondary', sib_eng: 'Sibounheuang - English',
-            chom_kg: 'Chommany - KG', chom_pri: 'Chommany - Primary',
-            chom_sec: 'Chommany - Secondary', chom_eng: 'Chommany - English'
+            sib_kg: 'Sibounheuang (ສີບຸນເຮືອງ) - KG', sib_pri: 'Sibounheuang (ສີບຸນເຮືອງ) - Primary',
+            sib_sec: 'Sibounheuang (ສີບຸນເຮືອງ) - Secondary', sib_eng: 'Sibounheuang (ສີບຸນເຮືອງ) - English',
+            chom_kg: 'Chommany (ຈອມມະນີ) - KG', chom_pri: 'Chommany (ຈອມມະນີ) - Primary',
+            chom_sec: 'Chommany (ຈອມມະນີ) - Secondary', chom_eng: 'Chommany (ຈອມມະນີ) - English'
         };
 
         const menuTableStyles = {
@@ -880,6 +933,19 @@
             }
         });
 
+        function updateAuthUI() {
+            const hBtn = document.getElementById('headerLoginBtn');
+            const dBtn = document.getElementById('drawerLoginBtn');
+            if (state.isLoggedIn) {
+                hBtn.innerHTML = '<i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-blue"></i> Dashboard';
+                dBtn.innerHTML = '<i data-lucide="layout-dashboard" class="w-4 h-4"></i> Admin Dashboard';
+            } else {
+                hBtn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4 text-brand-blue"></i> Login';
+                dBtn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i> Login';
+            }
+            lucide.createIcons();
+        }
+
         function applyDynamicSettings() {
             // Favicon & Apple Touch Icon Update
             if (state.logo) {
@@ -897,6 +963,18 @@
                 lucide.createIcons();
             }
             
+            // Apply Lock State Global
+            const overlay = document.getElementById('systemLockOverlay');
+            if (state.isLocked) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('flex'), 10);
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+
             // Re-run countdown so it picks up target date instantly
             updateCountdown();
         }
@@ -906,12 +984,13 @@
             const loading = document.getElementById('firebaseLoading');
             let isFirstLoad = true;
             
-            // Listen to General Settings (Announcement, Menu, Links, Logo, Countdown)
+            // Listen to General Settings (Announcement, Menu, Links, Logo, Lock Status)
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     state.announcement = data.announcement || '';
                     state.logo = data.logo || '';
+                    if (data.isLocked !== undefined) state.isLocked = data.isLocked;
                     if (data.menu) state.menu = data.menu;
                     if (data.driveLinks) state.driveLinks = data.driveLinks;
                 }
@@ -927,7 +1006,7 @@
                 }
                 
                 // Show Announcement logic (Strictly memory-based)
-                if (state.announcement && state.announcement.trim() !== '' && !announcementShown) {
+                if (state.announcement && state.announcement.trim() !== '' && !announcementShown && !state.isLocked) {
                     document.getElementById('popupText').innerText = state.announcement;
                     const modal = document.getElementById('announcementModal');
                     modal.classList.remove('hidden');
@@ -973,7 +1052,8 @@
                     announcement: state.announcement,
                     menu: state.menu,
                     driveLinks: state.driveLinks,
-                    logo: state.logo
+                    logo: state.logo,
+                    isLocked: state.isLocked || false
                 }, { merge: true });
             } catch (e) { console.error("Error saving settings", e); alert("Error saving data to database."); }
         }
@@ -1628,6 +1708,40 @@
             window.switchView('department');
         };
 
+        // --- Secret System Lock Logic ---
+        window.openSecretModal = function(action) {
+            currentSecretAction = action;
+            document.getElementById('secretModalTitle').innerText = action === 'lock' ? 'System Lockdown' : 'System Override';
+            const m = document.getElementById('secretModal');
+            m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0');
+            document.getElementById('secretBox').classList.remove('scale-95');
+            document.getElementById('secretPassword').value = '';
+            document.getElementById('secretError').classList.add('hidden');
+            document.getElementById('secretPassword').focus();
+        };
+
+        window.closeSecretModal = function() {
+            const m = document.getElementById('secretModal');
+            m.classList.add('opacity-0'); document.getElementById('secretBox').classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 300);
+        };
+
+        window.executeSecretAction = function() {
+            const code = document.getElementById('secretPassword').value;
+            if (code === '0000') {
+                state.isLocked = (currentSecretAction === 'lock');
+                fbSaveSettings();
+                closeSecretModal();
+                if (currentSecretAction === 'lock') {
+                    window.closeLoginModal();
+                }
+            } else {
+                const err = document.getElementById('secretError');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 2000);
+            }
+        };
+
         // --- Auth Modal ---
         window.openLoginModalFromMenu = function() { window.toggleSideMenu(); setTimeout(window.openLoginModal, 300); };
         window.openLoginModal = function() {
@@ -1644,12 +1758,7 @@
             if (document.getElementById('adminPassword').value === '0000') {
                 state.isLoggedIn = true; 
                 window.closeLoginModal();
-                
-                document.getElementById('headerLoginBtn').classList.add('hidden'); 
-                document.getElementById('headerLogoutBtn').classList.remove('hidden');
-                document.getElementById('drawerLoginBtn').classList.add('hidden'); 
-                document.getElementById('drawerLogoutBtn').classList.remove('hidden');
-                
+                updateAuthUI();
                 window.renderCalendar();
                 
                 if (pendingEventDateStr) {
@@ -1664,11 +1773,7 @@
         window.logoutAdminFromMenu = function() { window.toggleSideMenu(); setTimeout(window.logoutAdmin, 300); };
         window.logoutAdmin = function() {
             state.isLoggedIn = false;
-            document.getElementById('headerLoginBtn').classList.remove('hidden'); 
-            document.getElementById('headerLogoutBtn').classList.add('hidden');
-            document.getElementById('drawerLoginBtn').classList.remove('hidden'); 
-            document.getElementById('drawerLogoutBtn').classList.add('hidden');
-            
+            updateAuthUI();
             window.renderCalendar(); 
             window.switchView('home');
         };
