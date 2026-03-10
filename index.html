@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neerada School | Staff Portal</title>
     
+    <!-- Dynamic Favicons -->
+    <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link id="dynamic-apple-icon" rel="apple-touch-icon" href="">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -101,7 +105,14 @@
         .draggable-item.drag-over { border-top: 2px solid #005bc5; background-color: #eff6ff; }
         
         /* Loading Overlay */
-        #firebaseLoading { transition: opacity 0.5s ease; }
+        #firebaseLoading { transition: opacity 0.3s ease; }
+
+        /* Breathing Blue-Green Gradient */
+        .breathing-blue-green {
+            background: linear-gradient(-45deg, #0ea5e9, #10b981, #3b82f6, #14b8a6);
+            background-size: 400% 400%;
+            animation: gradient-breath 12s ease infinite;
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col breathing-bg">
@@ -172,9 +183,9 @@
                     </button>
 
                     <!-- Logo -->
-                    <div class="flex items-center gap-3 cursor-pointer group ml-2" onclick="navigateAndClose('home')">
-                        <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300">
-                            <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    <div class="flex items-center gap-3 cursor-pointer group ml-2" onclick="window.switchView('home')">
+                        <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white w-10 h-10 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 flex items-center justify-center overflow-hidden" id="headerLogoContainer">
+                            <i data-lucide="graduation-cap" class="w-6 h-6" id="headerLogoIcon"></i>
                         </div>
                         <span class="font-heading font-extrabold text-2xl tracking-tight text-gray-900 uppercase hidden sm:block">Neerada</span>
                     </div>
@@ -333,94 +344,105 @@
                     </div>
                 </div>
 
-                <!-- Two Column Layout: Calendar & Countdown -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Two Column Layout: Calendar & Countdown Wrapper -->
+                <div class="breathing-blue-green rounded-[3.5rem] p-6 md:p-10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-white/30 relative overflow-hidden">
+                    <!-- Ambient Background Glow for Wrapper -->
+                    <div class="absolute -top-40 -right-40 w-96 h-96 bg-white/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <!-- Countdown Timer (Aesthetic & Colorful) -->
-                    <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 rounded-[2.5rem] shadow-glow border border-white/10 p-8 md:p-12 text-center relative overflow-hidden text-white flex flex-col justify-center h-full">
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                        <div class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
                         
-                        <div class="relative z-10">
-                            <div class="bg-white/20 backdrop-blur-md w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/30 text-white shadow-lg">
-                                <i data-lucide="calendar-clock" class="w-8 h-8"></i>
+                        <!-- Countdown Timer (Aesthetic Warm Tint) -->
+                        <div class="bg-gradient-to-br from-amber-50/95 via-rose-50/95 to-pink-100/90 backdrop-blur-xl rounded-[2.5rem] shadow-elegant border border-white/60 p-8 md:p-12 text-center relative overflow-hidden flex flex-col justify-center h-full">
+                            <!-- Decorative background blur orbs -->
+                            <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-rose-200 to-pink-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-gradient-to-tr from-amber-200 to-orange-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="bg-gradient-to-tr from-rose-100 to-pink-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-rose-200/50 shadow-md transform hover:rotate-12 transition-transform duration-500">
+                                    <i data-lucide="calendar-clock" class="w-8 h-8 text-rose-600"></i>
+                                </div>
+                                
+                                <h2 class="font-heading text-2xl md:text-3xl font-extrabold text-gray-900 uppercase tracking-widest mb-2">
+                                    Report Submission
+                                </h2>
+                                <p class="text-gray-600 font-medium text-lg mb-8 tracking-wide">ສົ່ງບົດລາຍງານ <span class="block mt-2 text-sm bg-white/80 text-rose-700 font-bold inline-block px-4 py-1.5 rounded-xl border border-rose-100 shadow-sm" id="targetDateDisplay">Loading...</span></p>
+                                
+                                <div class="flex justify-center gap-2 sm:gap-3 md:gap-5 w-full">
+                                    <!-- Days -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(225,29,72,0.25)] transform hover:-translate-y-1 transition-all duration-300">
+                                            <span id="cd-days" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-rose-500 to-red-600 drop-shadow-sm">00</span>
+                                        </div>
+                                        <span class="mt-3 sm:mt-4 font-bold text-rose-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Days <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ມື້</span></span>
+                                    </div>
+                                    <!-- Hours -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(37,99,235,0.25)] transform hover:-translate-y-1 transition-all duration-300">
+                                            <span id="cd-hours" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-indigo-600 drop-shadow-sm">00</span>
+                                        </div>
+                                        <span class="mt-3 sm:mt-4 font-bold text-blue-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Hrs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ຊົ່ວໂມງ</span></span>
+                                    </div>
+                                    <!-- Minutes -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(16,185,129,0.25)] transform hover:-translate-y-1 transition-all duration-300">
+                                            <span id="cd-mins" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-500 to-teal-600 drop-shadow-sm">00</span>
+                                        </div>
+                                        <span class="mt-3 sm:mt-4 font-bold text-emerald-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Mins <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ນາທີ</span></span>
+                                    </div>
+                                    <!-- Seconds -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(245,158,11,0.25)] transform hover:-translate-y-1 transition-all duration-300">
+                                            <span id="cd-secs" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-amber-500 to-orange-600 drop-shadow-sm">00</span>
+                                        </div>
+                                        <span class="mt-3 sm:mt-4 font-bold text-amber-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Secs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ວິນາທີ</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- School Calendar Card (Aesthetic Cool Tint) -->
+                        <div class="bg-gradient-to-br from-indigo-50/95 via-blue-50/95 to-cyan-100/90 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-elegant p-4 md:p-8 flex flex-col h-full relative group overflow-hidden">
+                            
+                            <!-- Calendar Header -->
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-gradient-to-tr from-brand-blue to-indigo-500 text-white p-2 md:p-3 rounded-xl shadow-md">
+                                        <i data-lucide="calendar" class="w-5 h-5 md:w-6 md:h-6"></i>
+                                    </div>
+                                    <h3 id="calMonthYear" class="font-aesthetic font-bold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-indigo-700 tracking-wide capitalize">Month 2026</h3>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="changeCalendarMonth(-1)" class="p-2.5 bg-white/80 border border-indigo-100 rounded-full shadow-sm hover:bg-white transition-colors text-indigo-700"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <button onclick="changeCalendarMonth(1)" class="p-2.5 bg-white/80 border border-indigo-100 rounded-full shadow-sm hover:bg-white transition-colors text-indigo-700"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Calendar Grid Headings -->
+                            <div class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-3">
+                                <div class="text-[10px] md:text-xs font-bold text-red-600 bg-red-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Su</div>
+                                <div class="text-[10px] md:text-xs font-bold text-blue-800 bg-blue-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Mo</div>
+                                <div class="text-[10px] md:text-xs font-bold text-blue-800 bg-blue-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Tu</div>
+                                <div class="text-[10px] md:text-xs font-bold text-blue-800 bg-blue-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">We</div>
+                                <div class="text-[10px] md:text-xs font-bold text-blue-800 bg-blue-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Th</div>
+                                <div class="text-[10px] md:text-xs font-bold text-blue-800 bg-blue-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Fr</div>
+                                <div class="text-[10px] md:text-xs font-bold text-purple-700 bg-purple-100/80 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Sa</div>
                             </div>
                             
-                            <h2 class="font-heading text-2xl md:text-3xl font-bold uppercase tracking-widest mb-2 drop-shadow-md">
-                                Report Submission
-                            </h2>
-                            <p class="text-indigo-100 font-medium text-lg mb-8 tracking-wide">ສົ່ງບົດລາຍງານ (Due <span id="targetDateDisplay">the 20th</span>)</p>
-                            
-                            <div class="flex flex-wrap justify-center gap-3 md:gap-5">
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
-                                        <span id="cd-days" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
-                                    </div>
-                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Days <span class="block text-[10px] font-normal mt-0.5 opacity-70">ມື້</span></span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
-                                        <span id="cd-hours" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
-                                    </div>
-                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Hrs <span class="block text-[10px] font-normal mt-0.5 opacity-70">ຊົ່ວໂມງ</span></span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
-                                        <span id="cd-mins" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
-                                    </div>
-                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Mins <span class="block text-[10px] font-normal mt-0.5 opacity-70">ນາທີ</span></span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-white/20 backdrop-blur-md border border-white/40 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg transform scale-105">
-                                        <span id="cd-secs" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
-                                    </div>
-                                    <span class="mt-4 font-bold text-white uppercase tracking-widest text-xs drop-shadow-sm">Secs <span class="block text-[10px] font-normal mt-0.5 opacity-90">ວິນາທີ</span></span>
-                                </div>
+                            <!-- Calendar Days Grid -->
+                            <div id="calGrid" class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-6">
+                                <!-- Days populated by JS -->
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- School Calendar Card (Aesthetic & Colorful) -->
-                    <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-elegant p-4 md:p-8 flex flex-col h-full relative group overflow-hidden">
-                        
-                        <!-- Calendar Header -->
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white p-2 md:p-3 rounded-xl shadow-md">
-                                    <i data-lucide="calendar" class="w-5 h-5 md:w-6 md:h-6"></i>
+                            <!-- Event Summary List -->
+                            <div class="flex-grow bg-white/60 rounded-2xl p-4 border border-white/80 shadow-sm overflow-hidden flex flex-col">
+                                <div class="flex justify-between items-center mb-3 sticky top-0">
+                                    <h4 class="text-sm font-bold text-indigo-900 tracking-wide uppercase">Monthly Events</h4>
+                                    <span class="text-[10px] text-gray-500 font-medium bg-white/80 px-2 py-0.5 rounded-md border border-white shadow-sm"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-brand-blue font-bold ml-1">•</span> Event</span>
                                 </div>
-                                <h3 id="calMonthYear" class="font-aesthetic font-bold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-indigo-600 tracking-wide capitalize">Month 2026</h3>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="changeCalendarMonth(-1)" class="p-2.5 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors text-gray-600"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                <button onclick="changeCalendarMonth(1)" class="p-2.5 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors text-gray-600"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-
-                        <!-- Calendar Grid Headings -->
-                        <div class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-3">
-                            <div class="text-[10px] md:text-xs font-bold text-red-600 bg-red-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Su</div>
-                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Mo</div>
-                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Tu</div>
-                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">We</div>
-                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Th</div>
-                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Fr</div>
-                            <div class="text-[10px] md:text-xs font-bold text-purple-600 bg-purple-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Sa</div>
-                        </div>
-                        
-                        <!-- Calendar Days Grid -->
-                        <div id="calGrid" class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-6">
-                            <!-- Days populated by JS -->
-                        </div>
-
-                        <!-- Event Summary List -->
-                        <div class="flex-grow bg-gray-50/80 rounded-2xl p-4 border border-gray-100 overflow-hidden flex flex-col">
-                            <div class="flex justify-between items-center mb-3 sticky top-0">
-                                <h4 class="text-sm font-bold text-gray-700 tracking-wide uppercase">Monthly Events</h4>
-                                <span class="text-[10px] text-gray-400 font-medium bg-white px-2 py-0.5 rounded-md border border-gray-100 shadow-sm"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-brand-blue font-bold ml-1">•</span> Event</span>
-                            </div>
-                            <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar">
-                                <!-- Events populated by JS -->
+                                <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar">
+                                    <!-- Events populated by JS -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -447,7 +469,7 @@
                     </div>
 
                     <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm bg-white">
-                        <table class="w-full text-left border-collapse min-w-[600px]">
+                        <table class="w-full text-center border-collapse min-w-[600px]">
                             <thead>
                                 <tr class="bg-gray-50/80 border-b border-gray-200">
                                     <th class="py-5 px-6 font-heading font-bold text-gray-700 uppercase tracking-wider text-sm w-1/4">Date / ມື້</th>
@@ -474,7 +496,8 @@
                 </div>
             </div>
 
-            <div id="teacherGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+            <!-- Aesthetic Staff Grid -->
+            <div id="teacherGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
                 <!-- Teacher Cards -->
             </div>
 
@@ -503,6 +526,36 @@
                 <!-- COL 1: Home Page Content -->
                 <div class="space-y-8">
                     
+                    <!-- General Settings (Logo & Countdown) -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-100"><i data-lucide="settings" class="text-purple-600 w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Portal Settings</h2>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <!-- Logo Upload -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">School Logo (Favicon)</label>
+                                <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
+                                    <input type="file" id="adminLogoUpload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'logoImageState', 'logoImgPreview', 400)">
+                                    <div id="logoImgPreviewContainer" class="hidden flex flex-col items-center">
+                                        <img id="logoImgPreview" class="w-16 h-16 object-contain mb-3">
+                                        <span class="text-xs font-medium text-purple-600">Logo Selected</span>
+                                    </div>
+                                    <div id="logoImgPreviewPlaceholder" class="text-gray-400">
+                                        <i data-lucide="image-plus" class="w-6 h-6 mx-auto mb-2 text-gray-300 group-hover:text-purple-600 transition-colors"></i>
+                                        <span class="text-sm font-medium">Upload Logo</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="savePortalSettings()" class="w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Announcement Form -->
                     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
                         <div class="flex items-center gap-4 mb-6">
@@ -598,15 +651,18 @@
                                 <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
                             </div>
                             
+                            <input type="url" id="tDriveLink" placeholder="Personal Google Drive Folder URL (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+
                             <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
                                 <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 400)">
                                 <div id="teacherImgPreviewContainer" class="hidden flex flex-col items-center">
-                                    <img id="teacherImgPreview" class="w-16 h-16 object-cover rounded-full border border-gray-200 mb-3 shadow-sm">
+                                    <!-- Use object-contain and aspect-portrait logic for preview -->
+                                    <img id="teacherImgPreview" class="w-16 h-20 object-contain rounded border border-gray-200 mb-3 shadow-sm bg-gray-100">
                                     <span class="text-xs font-medium text-indigo-600">Photo Selected</span>
                                 </div>
                                 <div id="teacherImgPreviewPlaceholder" class="text-gray-400">
                                     <i data-lucide="camera" class="w-6 h-6 mx-auto mb-2 text-gray-300 group-hover:text-indigo-600 transition-colors"></i>
-                                    <span class="text-sm font-medium">Upload Photo</span>
+                                    <span class="text-sm font-medium">Upload Photo (Portrait)</span>
                                 </div>
                             </div>
                             <div class="flex gap-3 pt-2">
@@ -616,6 +672,43 @@
                                 <button id="cancelEditBtn" onclick="cancelEditTeacher()" class="hidden bg-white text-gray-500 border border-gray-200 font-semibold text-sm px-5 py-3.5 rounded-xl shadow-sm hover:bg-gray-50 transition-all">
                                     <i data-lucide="x" class="w-4 h-4"></i>
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Upload Teachers -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-100"><i data-lucide="file-up" class="text-brand-blue w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Bulk Upload Staff (CSV)</h2>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-xs text-gray-500">Add multiple staff members at once using a CSV template. Ensure you use the exact Department Codes.</p>
+                            
+                            <button onclick="downloadStaffTemplate()" class="w-full bg-white text-brand-blue border border-brand-blue/30 font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:bg-blue-50 transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4"></i> Download CSV Template
+                            </button>
+                            
+                            <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
+                                <input type="file" id="bulkStaffInput" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleBulkUpload(event)">
+                                <div class="text-gray-400">
+                                    <i data-lucide="upload-cloud" class="w-6 h-6 mx-auto mb-2 text-gray-300 group-hover:text-brand-blue transition-colors"></i>
+                                    <span class="text-sm font-medium">Upload Filled CSV</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mt-2">
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wider block mb-1.5">Valid Dept Codes:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">sib_kg</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">sib_pri</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">sib_sec</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">sib_eng</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">chom_kg</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">chom_pri</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">chom_sec</span>
+                                    <span class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm">chom_eng</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -639,11 +732,11 @@
                         <div class="overflow-y-auto pr-2 space-y-2 flex-grow" id="adminTeacherList"></div>
                     </div>
 
-                    <!-- Drive Links Manager -->
+                    <!-- Drive Links Manager (Department Wide) -->
                     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
                         <div class="flex items-center gap-4 mb-6">
                             <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200"><i data-lucide="link" class="text-gray-600 w-5 h-5"></i></div>
-                            <h2 class="font-heading text-lg font-bold text-gray-900">Drive Links</h2>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Department Drive Links</h2>
                         </div>
                         <div class="grid grid-cols-1 gap-4" id="adminLinksContainer"></div>
                         <button onclick="saveDriveLinks()" class="mt-6 w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
@@ -671,7 +764,6 @@
     <!-- FIREBASE & INTERACTIVE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // FIX #2: Imported signInWithCustomToken which was missing
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -682,11 +774,9 @@
         // ==========================================
         let firebaseConfig;
 
-        // FIX #3: Contextual injection check so it works locally AND in preview platforms securely.
         if (typeof __firebase_config !== 'undefined') {
             firebaseConfig = JSON.parse(__firebase_config);
         } else {
-            // FIX #1: Fixed the syntax error here (duplicate "const firebaseConfig = {")
             firebaseConfig = {
                 apiKey: "AIzaSyCPXbxPr0C_EtBx2tZAQfKCD4lo6ZnmQ00",
                 authDomain: "neerada-staff.firebaseapp.com",
@@ -705,10 +795,8 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
         const getColPath = (col) => {
             if (typeof __app_id !== 'undefined') {
-                // Canvas preview environment
                 return `artifacts/${appId}/public/data/${col}`;
             }
-            // Real production environment - writes directly to root collections
             return col; 
         };
 
@@ -716,6 +804,7 @@
         let state = {
             isLoggedIn: false,
             announcement: '',
+            logo: '', 
             events: [], 
             menu: {
                 monday: { lao: 'ເຂົ້າຜັດ', eng: 'Fried Rice' },
@@ -737,9 +826,10 @@
         let displayYear = currentCalDate.getFullYear();
         let pendingEventDateStr = null; 
 
-        let tempImages = { teacherImageState: null, featuredImageState: null };
+        let tempImages = { teacherImageState: null, logoImageState: null };
         let editingTeacherId = null;
         let draggedTeacherId = null;
+        let announcementShown = false;
 
         const deptNames = {
             sib_kg: 'Sibounheuang - KG', sib_pri: 'Sibounheuang - Primary',
@@ -755,8 +845,6 @@
             thursday: 'bg-orange-50/70 border-orange-200 text-orange-900',
             friday: 'bg-blue-50/70 border-blue-200 text-blue-900'
         };
-
-        let announcementShown = false; // Memory variable replacing sessionStorage
 
         // --- Authentication & Initialization ---
         async function initFirebase() {
@@ -780,26 +868,53 @@
             }
         });
 
+        function applyDynamicSettings() {
+            // Favicon & Apple Touch Icon Update
+            if (state.logo) {
+                document.getElementById('dynamic-favicon').href = state.logo;
+                document.getElementById('dynamic-apple-icon').href = state.logo;
+                
+                const headerLogoContainer = document.getElementById('headerLogoContainer');
+                headerLogoContainer.innerHTML = `<img src="${state.logo}" class="w-full h-full object-cover">`;
+                headerLogoContainer.classList.remove('bg-gradient-to-tr', 'from-brand-blue', 'to-brand-green');
+            } else {
+                // Default fallback
+                const headerLogoContainer = document.getElementById('headerLogoContainer');
+                headerLogoContainer.innerHTML = `<i data-lucide="graduation-cap" class="w-6 h-6"></i>`;
+                headerLogoContainer.classList.add('bg-gradient-to-tr', 'from-brand-blue', 'to-brand-green');
+                lucide.createIcons();
+            }
+            
+            // Re-run countdown so it picks up target date instantly
+            updateCountdown();
+        }
+
         // Setup real-time connection to Firebase
         function setupRealtimeListeners() {
             const loading = document.getElementById('firebaseLoading');
+            let isFirstLoad = true;
             
-            // Listen to General Settings (Announcement, Menu, Links)
+            // Listen to General Settings (Announcement, Menu, Links, Logo, Countdown)
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     state.announcement = data.announcement || '';
+                    state.logo = data.logo || '';
                     if (data.menu) state.menu = data.menu;
                     if (data.driveLinks) state.driveLinks = data.driveLinks;
                 }
                 renderHomeContent();
+                applyDynamicSettings();
                 
-                if(loading) {
-                    loading.style.opacity = '0';
-                    setTimeout(() => loading.classList.add('hidden'), 500);
+                if (isFirstLoad) {
+                    if(loading) {
+                        loading.style.opacity = '0';
+                        setTimeout(() => loading.classList.add('hidden'), 300);
+                    }
+                    isFirstLoad = false;
                 }
                 
-                // Show Announcement logic (Strictly memory-based, no local storage)
+                // Show Announcement logic (Strictly memory-based)
                 if (state.announcement && state.announcement.trim() !== '' && !announcementShown) {
                     document.getElementById('popupText').innerText = state.announcement;
                     const modal = document.getElementById('announcementModal');
@@ -845,7 +960,8 @@
                 await setDoc(doc(db, getColPath('portal_settings'), 'main'), {
                     announcement: state.announcement,
                     menu: state.menu,
-                    driveLinks: state.driveLinks
+                    driveLinks: state.driveLinks,
+                    logo: state.logo
                 }, { merge: true });
             } catch (e) { console.error("Error saving settings", e); alert("Error saving data to database."); }
         }
@@ -1110,11 +1226,12 @@
                 const dateStr = weekDates[index].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const dayLabel = `${dayNamesEn[index]}<span class="block text-xs font-normal opacity-70 mt-0.5">${dayNamesLa[index]} • ${dateStr}</span>`;
                 
+                // Bigger fonts (text-base and text-lg), and centered text
                 tbody.innerHTML += `
                     <tr class="${rowClass} hover:opacity-90 transition-opacity">
-                        <td class="py-4 px-6 font-heading font-bold text-sm border-r border-white/40 align-top w-1/4">${dayLabel}</td>
-                        <td class="py-4 px-6 font-semibold text-sm whitespace-pre-line border-r border-white/40 align-top w-3/8">${data.lao}</td>
-                        <td class="py-4 px-6 font-medium text-sm whitespace-pre-line align-top w-3/8 text-gray-700/90">${data.eng}</td>
+                        <td class="py-5 px-6 font-heading font-bold text-base border-r border-white/40 align-middle w-1/4 text-center">${dayLabel}</td>
+                        <td class="py-5 px-6 font-semibold text-lg whitespace-pre-line border-r border-white/40 align-middle w-3/8 text-center">${data.lao}</td>
+                        <td class="py-5 px-6 font-medium text-lg whitespace-pre-line align-middle w-3/8 text-center text-gray-700/90">${data.eng}</td>
                     </tr>
                 `;
             });
@@ -1125,6 +1242,17 @@
         // --- Admin Form Loading ---
         window.loadAdminForms = function() {
             document.getElementById('adminAnnouncement').value = state.announcement;
+            
+            // Clear temp logo
+            tempImages.logoImageState = null;
+            if (state.logo) {
+                document.getElementById('logoImgPreview').src = state.logo;
+                document.getElementById('logoImgPreviewContainer').classList.remove('hidden');
+                document.getElementById('logoImgPreviewPlaceholder').classList.add('hidden');
+            } else {
+                document.getElementById('logoImgPreviewContainer').classList.add('hidden');
+                document.getElementById('logoImgPreviewPlaceholder').classList.remove('hidden');
+            }
             
             const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
             days.forEach(day => {
@@ -1137,6 +1265,14 @@
             window.renderAdminTeachers();
             window.renderDriveLinksForm();
         };
+
+        window.savePortalSettings = function() {
+            if (tempImages.logoImageState !== null) {
+                state.logo = tempImages.logoImageState;
+            }
+            fbSaveSettings();
+            alert("Settings Saved!");
+        }
 
         window.saveAllMenus = function() {
             const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -1169,7 +1305,7 @@
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    const base64 = canvas.toDataURL('image/jpeg', 0.6); 
+                    const base64 = canvas.toDataURL('image/png'); // Using PNG to preserve transparency for logos
                     tempImages[stateKey] = base64;
                     
                     document.getElementById(previewImgId).src = base64;
@@ -1218,9 +1354,10 @@
             const level = document.getElementById('tLevel').value.trim();
             const room = document.getElementById('tRoom').value.trim();
             const department = document.getElementById('tDept').value;
+            const driveLink = document.getElementById('tDriveLink').value.trim();
             const image = tempImages.teacherImageState;
 
-            const teacherData = { name, level, room, department, order: state.teachers.length };
+            const teacherData = { name, level, room, department, driveLink, order: state.teachers.length };
             if (image !== null) teacherData.image = image;
 
             if (editingTeacherId) {
@@ -1240,6 +1377,7 @@
             document.getElementById('tLevel').value = teacher.level || '';
             document.getElementById('tRoom').value = teacher.room || '';
             document.getElementById('tDept').value = teacher.department;
+            document.getElementById('tDriveLink').value = teacher.driveLink || '';
             
             tempImages.teacherImageState = null;
             const previewContainer = document.getElementById('teacherImgPreviewContainer');
@@ -1266,6 +1404,7 @@
             document.getElementById('tLevel').value = '';
             document.getElementById('tRoom').value = '';
             document.getElementById('tDept').value = 'sib_kg';
+            document.getElementById('tDriveLink').value = '';
             
             tempImages.teacherImageState = null;
             document.getElementById('adminTeacherFileInput').value = '';
@@ -1277,6 +1416,63 @@
             document.getElementById('saveTeacherBtn').innerText = 'Add to Roster';
             document.getElementById('cancelEditBtn').classList.add('hidden');
             lucide.createIcons();
+        };
+
+        window.downloadStaffTemplate = function() {
+            const csvContent = "Name,Level,Room,Department,DriveLink\nJohn Doe,P1,101,sib_pri,https://drive.google.com/...\nJane Smith,K1,KG-A,chom_kg,";
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "neerada_staff_template.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        window.handleBulkUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                
+                if(rows.length < 2) {
+                    alert("File seems empty or missing data rows.");
+                    return;
+                }
+
+                let successCount = 0;
+                let startOrder = state.teachers.length;
+
+                for(let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if(!row) continue;
+                    
+                    // Basic comma split - avoid using commas within the names/links in the CSV.
+                    const cols = row.split(',');
+                    
+                    if(cols.length >= 4) {
+                        const name = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
+                        if(!name) continue;
+
+                        const level = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
+                        const room = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
+                        const department = cols[3] ? cols[3].replace(/"/g, '').trim().toLowerCase() : 'sib_kg';
+                        const driveLink = cols[4] ? cols[4].replace(/"/g, '').trim() : '';
+
+                        const teacherData = { name, level, room, department, driveLink, order: startOrder++ };
+                        fbAddTeacher(teacherData);
+                        successCount++;
+                    }
+                }
+                alert(`Successfully queued ${successCount} staff members for upload!`);
+                event.target.value = ''; 
+            };
+            reader.readAsText(file);
         };
 
         window.deleteTeacher = function(id) {
@@ -1299,6 +1495,7 @@
             
             filtered.forEach(t => {
                 const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f1f5f9&color=475569&bold=true';
+                // Adjusting the thumbnail in the admin view to be uncut (object-contain)
                 list.innerHTML += `
                     <div class="draggable-item flex items-center justify-between bg-white border border-gray-100 p-3 rounded-xl hover:border-brand-blue/30 shadow-sm transition-all"
                          draggable="true" 
@@ -1311,10 +1508,11 @@
                         
                         <div class="flex items-center gap-3 w-full">
                             <div class="cursor-grab text-gray-300 hover:text-gray-500 py-2"><i data-lucide="grip-vertical" class="w-5 h-5"></i></div>
-                            <img src="${pic}" class="w-10 h-10 rounded-full object-cover border border-gray-100 pointer-events-none">
+                            <img src="${pic}" class="w-10 h-14 rounded bg-gray-50 object-contain border border-gray-100 pointer-events-none">
                             <div class="pointer-events-none overflow-hidden pr-2">
                                 <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate">${t.name}</h4>
                                 <div class="text-[10px] font-medium text-gray-500 uppercase truncate">${deptNames[t.department]} | Rm: ${t.room||'-'}</div>
+                                ${t.driveLink ? `<div class="text-[10px] text-blue-500 mt-0.5"><i data-lucide="link" class="w-3 h-3 inline"></i> Link Added</div>` : ''}
                             </div>
                         </div>
                         <div class="flex gap-1.5 flex-shrink-0">
@@ -1384,12 +1582,26 @@
             } else {
                 dt.forEach(t => {
                     const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f8fafc&color=334155&size=200&bold=true';
+                    
+                    // Wrapping the whole card in an anchor tag if driveLink exists
+                    // Image set to aspect-[3/4] and object-contain to prevent cutting, with badge-like design for level/room.
+                    const hrefStr = t.driveLink ? `href="${t.driveLink.startsWith('http') ? t.driveLink : 'https://'+t.driveLink}" target="_blank"` : `href="#"`;
+                    const pointerClass = t.driveLink ? `cursor-pointer hover:shadow-xl hover:-translate-y-1` : `cursor-default`;
+
                     grid.innerHTML += `
-                        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-card border border-white/40 overflow-hidden flex flex-col h-full group">
-                            <div class="h-48 bg-gray-50 relative overflow-hidden"><img src="${pic}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"><div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div><h3 class="absolute bottom-4 left-5 right-5 text-white font-heading font-bold text-xl truncate">${t.name}</h3></div>
-                            <div class="p-5 flex-grow flex flex-col gap-3">
-                                <div class="flex justify-between border-b border-gray-50 pb-2"><span class="text-gray-400 font-semibold uppercase text-xs">Level</span><span class="font-medium text-gray-700 text-sm">${t.level||'-'}</span></div>
-                                <div class="flex justify-between items-center"><span class="text-gray-400 font-semibold uppercase text-xs">Room</span><span class="bg-brand-blue/10 text-brand-blue px-3 py-1 rounded-lg font-semibold text-sm">${t.room||'-'}</span></div></div></div>`;
+                        <a ${hrefStr} class="bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-card border border-white/40 overflow-hidden flex flex-col h-full group transition-all ${pointerClass}">
+                            <div class="w-full aspect-[3/4] bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden flex items-center justify-center p-2 border-b border-gray-100">
+                                <img src="${pic}" class="w-full h-full object-contain rounded-xl group-hover:scale-[1.02] transition-transform duration-500">
+                                ${t.driveLink ? `<div class="absolute top-3 right-3 bg-brand-blue/90 text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
+                            </div>
+                            <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
+                                <h3 class="font-aesthetic font-bold text-2xl text-gray-900 truncate tracking-tight">${t.name}</h3>
+                                <div class="flex items-center justify-center gap-2 mt-1">
+                                    <span class="font-heading font-bold text-brand-blue/90 text-sm tracking-wide px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">${t.level||'-'}</span>
+                                    <span class="font-heading font-bold text-brand-orange/90 text-sm tracking-wide px-3 py-1 bg-orange-50 border border-orange-100 rounded-full">${t.room||'-'}</span>
+                                </div>
+                            </div>
+                        </a>`;
                 });
             }
             lucide.createIcons();
@@ -1449,26 +1661,65 @@
             window.switchView('home');
         };
 
-        // --- Countdown ---
-        function calculateNextTargetDate() {
-            const now = new Date(); let t = new Date(now.getFullYear(), now.getMonth(), 20, 23, 59, 59);
-            if (now > t) t.setMonth(t.getMonth() + 1);
-            if (t.getDay() === 6) t.setDate(19); else if (t.getDay() === 0) t.setDate(21);
-            return t;
+        // --- Countdown Sync ---
+        function getDeadlineForMonth(year, month) {
+            let deadlineDay = 20;
+            let tempDate = new Date(year, month, deadlineDay);
+            let dayOfWeek = tempDate.getDay();
+
+            if (dayOfWeek === 6) { // Saturday
+                deadlineDay = 22; // Next Monday
+            } else if (dayOfWeek === 0) { // Sunday
+                deadlineDay = 21; // Next Monday
+            }
+            return new Date(year, month, deadlineDay, 23, 59, 59);
         }
+
+        function calculateNextTargetDate() {
+            const now = new Date();
+            let currentYear = now.getFullYear();
+            let currentMonth = now.getMonth();
+
+            let targetDate = getDeadlineForMonth(currentYear, currentMonth);
+
+            if (now > targetDate) {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                targetDate = getDeadlineForMonth(currentYear, currentMonth);
+            }
+            return targetDate;
+        }
+
         function updateCountdown() {
-            const now = new Date(); const target = calculateNextTargetDate();
-            document.getElementById('targetDateDisplay').innerText = `Due: ${target.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+            const target = calculateNextTargetDate();
+            const now = new Date(); 
+            
+            const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('targetDateDisplay').innerText = `${formatter.format(target)}`;
+            
             const diff = target - now;
-            if (diff <= 0) return;
+            
+            if (diff <= 0) {
+                ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'].forEach(id => document.getElementById(id).innerText = '00');
+                return;
+            }
+            
             document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
             document.getElementById('cd-hours').innerText = Math.floor((diff / 3600000) % 24).toString().padStart(2, '0');
             document.getElementById('cd-mins').innerText = Math.floor((diff / 60000) % 60).toString().padStart(2, '0');
             document.getElementById('cd-secs').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
         }
-        function initCountdown() { updateCountdown(); setInterval(updateCountdown, 1000); }
+        
+        function initCountdown() { 
+            updateCountdown(); 
+            setInterval(updateCountdown, 1000); 
+        }
 
         initFirebase();
+        initCountdown();
     </script>
 </body>
 </html>
