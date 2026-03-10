@@ -541,21 +541,22 @@
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] bg-gradient-to-tr from-yellow-100/20 to-orange-100/20 rounded-full blur-[150px] mix-blend-multiply opacity-50"></div>
             </div>
 
-            <div class="max-w-7xl mx-auto relative z-10">
-                <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-gray-200/50 pb-8 gap-4 text-center md:text-left">
-                    <div>
+            <div class="max-w-7xl mx-auto relative z-10 flex flex-col items-center">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-gray-300/50 pb-6 gap-4 text-center w-full">
+                    <div class="w-full text-center">
                         <span class="text-brand-blue font-semibold tracking-widest uppercase text-xs mb-2 block">Department Roster</span>
                         <h1 id="deptTitle" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Department Name</h1>
                     </div>
                 </div>
 
-                <!-- Aesthetic Staff Grid (Flex Wrap for Perfect Centering) -->
-                <div id="teacherGrid" class="flex flex-wrap justify-center gap-8 mb-16 items-stretch w-full">
-                    <!-- Teacher Cards -->
+                <!-- Upload buttons will move dynamically here -->
+                <div id="deptUploadBox" class="mb-12 w-full text-center flex flex-col items-center justify-center">
+                    <!-- Dynamically populated via JS -->
                 </div>
 
-                <div class="bg-white/80 backdrop-blur-md rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant" id="deptUploadBox">
-                    <!-- Will be dynamically populated for regular dept OR english dept -->
+                <!-- Aesthetic Staff Grid (Cards) injected dynamically with Dividers -->
+                <div id="teacherGrid" class="w-full pb-16">
+                    <!-- Teacher Cards and Group Dividers inserted via JS -->
                 </div>
             </div>
         </section>
@@ -699,7 +700,7 @@
                             </select>
                             <input type="text" id="tName" placeholder="Teacher Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
                             <div class="flex gap-4">
-                                <input type="text" id="tLevel" placeholder="Level (P1)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
+                                <input type="text" id="tLevel" placeholder="Level/Group (e.g. P1 Teachers)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
                                 <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
                             </div>
                             
@@ -1778,35 +1779,64 @@
 
         window.showDepartment = function(deptKey, title) {
             document.getElementById('deptTitle').innerText = title;
-            const grid = document.getElementById('teacherGrid'); grid.innerHTML = '';
+            const container = document.getElementById('teacherGrid');
+            container.innerHTML = '';
+            
             const dt = state.teachers.filter(t => t.department === deptKey);
+            
             if (dt.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 bg-white/80 backdrop-blur-sm rounded-3xl border border-dashed border-gray-200"><i data-lucide="users" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i><p class="text-gray-400 font-medium text-lg">No teachers assigned</p></div>`;
+                container.innerHTML = `<div class="w-full text-center py-16 bg-white/40 backdrop-blur-sm rounded-3xl border border-dashed border-gray-200"><i data-lucide="users" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i><p class="text-gray-400 font-medium text-lg">No teachers assigned</p></div>`;
             } else {
+                // Group by level
+                const groups = {};
                 dt.forEach(t => {
-                    const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f8fafc&color=334155&size=200&bold=true';
-                    
-                    // Wrapping the whole card in an anchor tag if driveLink exists
-                    // Image set to aspect-[3/4] and object-contain to prevent cutting, with badge-like design for level/room.
-                    const hrefStr = t.driveLink ? `href="${t.driveLink.startsWith('http') ? t.driveLink : 'https://'+t.driveLink}" target="_blank"` : `href="#"`;
-                    const pointerClass = t.driveLink ? `cursor-pointer hover:shadow-xl hover:-translate-y-1` : `cursor-default`;
-
-                    // Using specific fixed widths that shrink beautifully, paired with flex-wrap
-                    grid.innerHTML += `
-                        <a ${hrefStr} class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[280px] flex-shrink-0 bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-card border border-white/40 overflow-hidden flex flex-col group transition-all ${pointerClass}">
-                            <div class="w-full aspect-[3/4] bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden flex items-center justify-center p-2 border-b border-gray-100">
-                                <img src="${pic}" class="w-full h-full object-contain rounded-xl group-hover:scale-[1.02] transition-transform duration-500">
-                                ${t.driveLink ? `<div class="absolute top-3 right-3 bg-brand-blue/90 text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
-                            </div>
-                            <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
-                                <h3 class="font-aesthetic font-bold text-xl sm:text-2xl text-gray-900 tracking-tight break-words whitespace-normal leading-tight">${t.name}</h3>
-                                <div class="flex items-center justify-center gap-2 mt-1">
-                                    <span class="font-heading font-bold text-brand-blue/90 text-sm tracking-wide px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">${t.level||'-'}</span>
-                                    <span class="font-heading font-bold text-brand-orange/90 text-sm tracking-wide px-3 py-1 bg-orange-50 border border-orange-100 rounded-full">${t.room||'-'}</span>
-                                </div>
-                            </div>
-                        </a>`;
+                    const lvl = t.level && t.level.trim() !== '' ? t.level.trim() : 'General';
+                    if(!groups[lvl]) groups[lvl] = [];
+                    groups[lvl].push(t);
                 });
+
+                // Sort groups (General at the end, others alphabetical)
+                const groupKeys = Object.keys(groups).sort((a, b) => {
+                    if (a === 'General') return 1;
+                    if (b === 'General') return -1;
+                    return a.localeCompare(b);
+                });
+
+                let html = '';
+                groupKeys.forEach(g => {
+                    // Divider
+                    html += `
+                        <div class="w-full flex items-center gap-4 my-8">
+                            <div class="h-px bg-gradient-to-r from-transparent to-brand-blue/30 flex-grow"></div>
+                            <span class="font-heading font-bold text-brand-blue uppercase tracking-widest text-sm bg-blue-50/50 px-4 py-1.5 rounded-full border border-blue-100">${g}</span>
+                            <div class="h-px bg-gradient-to-l from-transparent to-brand-blue/30 flex-grow"></div>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-8 items-stretch w-full">
+                    `;
+                    
+                    groups[g].forEach(t => {
+                        const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f8fafc&color=334155&size=200&bold=true';
+                        const hrefStr = t.driveLink ? `href="${t.driveLink.startsWith('http') ? t.driveLink : 'https://'+t.driveLink}" target="_blank"` : `href="#"`;
+                        const pointerClass = t.driveLink ? `cursor-pointer hover:shadow-xl hover:-translate-y-1` : `cursor-default`;
+
+                        html += `
+                            <a ${hrefStr} class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[280px] flex-shrink-0 bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-card border border-white/40 overflow-hidden flex flex-col group transition-all ${pointerClass}">
+                                <div class="w-full aspect-[3/4] bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden flex items-center justify-center p-2 border-b border-gray-100">
+                                    <img src="${pic}" class="w-full h-full object-contain rounded-xl group-hover:scale-[1.02] transition-transform duration-500">
+                                    ${t.driveLink ? `<div class="absolute top-3 right-3 bg-brand-blue/90 text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
+                                </div>
+                                <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
+                                    <h3 class="font-aesthetic font-bold text-xl sm:text-2xl text-gray-900 tracking-tight break-words whitespace-normal leading-tight">${t.name}</h3>
+                                    <div class="flex items-center justify-center gap-2 mt-1">
+                                        <span class="font-heading font-bold text-brand-orange/90 text-sm tracking-wide px-3 py-1 bg-orange-50 border border-orange-100 rounded-full">${t.room||'-'}</span>
+                                    </div>
+                                </div>
+                            </a>`;
+                    });
+                    
+                    html += `</div>`;
+                });
+                container.innerHTML = html;
             }
             
             // Build the upload box dynamically depending on if it's the English dept
@@ -1814,43 +1844,50 @@
             if (deptKey === 'sib_eng' || deptKey === 'chom_eng') {
                 const prefix = deptKey; 
                 uploadHtml = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mx-auto">
-                        <a href="${state.driveLinks[prefix+'_kg'] ? (state.driveLinks[prefix+'_kg'].startsWith('http') ? state.driveLinks[prefix+'_kg'] : 'https://'+state.driveLinks[prefix+'_kg']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-blue/10 rounded-2xl hover:bg-brand-blue/20 transition-colors ${state.driveLinks[prefix+'_kg'] ? '' : 'opacity-50 pointer-events-none'}">
-                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-blue mb-2"></i>
-                            <span class="font-bold text-sm text-brand-blue uppercase tracking-widest">Kindergarten</span>
+                    <div class="flex flex-wrap justify-center gap-4 w-full">
+                        <a href="${state.driveLinks[prefix+'_kg'] ? (state.driveLinks[prefix+'_kg'].startsWith('http') ? state.driveLinks[prefix+'_kg'] : 'https://'+state.driveLinks[prefix+'_kg']) : '#'}" target="_blank" class="flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:shadow-[0_8px_20px_-6px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all ${state.driveLinks[prefix+'_kg'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-5 h-5"></i>
+                            <div class="flex flex-col text-left">
+                                <span class="font-bold text-xs uppercase tracking-widest leading-none">Kindergarten</span>
+                                <span class="text-[10px] text-blue-100 font-medium">ອະນຸບານ</span>
+                            </div>
                         </a>
-                        <a href="${state.driveLinks[prefix+'_pri'] ? (state.driveLinks[prefix+'_pri'].startsWith('http') ? state.driveLinks[prefix+'_pri'] : 'https://'+state.driveLinks[prefix+'_pri']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-green/10 rounded-2xl hover:bg-brand-green/20 transition-colors ${state.driveLinks[prefix+'_pri'] ? '' : 'opacity-50 pointer-events-none'}">
-                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-green mb-2"></i>
-                            <span class="font-bold text-sm text-brand-green uppercase tracking-widest">Primary</span>
+                        <a href="${state.driveLinks[prefix+'_pri'] ? (state.driveLinks[prefix+'_pri'].startsWith('http') ? state.driveLinks[prefix+'_pri'] : 'https://'+state.driveLinks[prefix+'_pri']) : '#'}" target="_blank" class="flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full hover:shadow-[0_8px_20px_-6px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 transition-all ${state.driveLinks[prefix+'_pri'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-5 h-5"></i>
+                            <div class="flex flex-col text-left">
+                                <span class="font-bold text-xs uppercase tracking-widest leading-none">Primary</span>
+                                <span class="text-[10px] text-emerald-100 font-medium">ປະຖົມ</span>
+                            </div>
                         </a>
-                        <a href="${state.driveLinks[prefix+'_sec'] ? (state.driveLinks[prefix+'_sec'].startsWith('http') ? state.driveLinks[prefix+'_sec'] : 'https://'+state.driveLinks[prefix+'_sec']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-orange/10 rounded-2xl hover:bg-brand-orange/20 transition-colors ${state.driveLinks[prefix+'_sec'] ? '' : 'opacity-50 pointer-events-none'}">
-                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-orange mb-2"></i>
-                            <span class="font-bold text-sm text-brand-orange uppercase tracking-widest">Secondary</span>
+                        <a href="${state.driveLinks[prefix+'_sec'] ? (state.driveLinks[prefix+'_sec'].startsWith('http') ? state.driveLinks[prefix+'_sec'] : 'https://'+state.driveLinks[prefix+'_sec']) : '#'}" target="_blank" class="flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:shadow-[0_8px_20px_-6px_rgba(249,115,22,0.4)] hover:-translate-y-0.5 transition-all ${state.driveLinks[prefix+'_sec'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-5 h-5"></i>
+                            <div class="flex flex-col text-left">
+                                <span class="font-bold text-xs uppercase tracking-widest leading-none">Secondary</span>
+                                <span class="text-[10px] text-orange-100 font-medium">ມັດທະຍົມ</span>
+                            </div>
                         </a>
                     </div>
                 `;
                 if(!state.driveLinks[prefix+'_kg'] && !state.driveLinks[prefix+'_pri'] && !state.driveLinks[prefix+'_sec']) {
-                    uploadHtml += `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Links not configured by Admin yet.</p>`;
+                    uploadHtml += `<p class="text-red-500 font-medium text-xs mt-3 bg-red-50 inline-block px-3 py-1 rounded-md border border-red-100">Links not configured</p>`;
                 }
             } else {
                 const link = state.driveLinks[deptKey];
                 const isActive = link && link.trim() !== '';
                 uploadHtml = `
-                    <a href="${isActive ? (link.startsWith('http') ? link : 'https://'+link) : '#'}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all ${isActive ? '' : 'opacity-50 pointer-events-none'}">
-                        Open Google Drive
+                    <a href="${isActive ? (link.startsWith('http') ? link : 'https://'+link) : '#'}" target="_blank" class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-brand-blue to-indigo-600 text-white px-8 py-4 rounded-full font-semibold text-sm tracking-wide shadow-[0_8px_20px_-6px_rgba(79,70,229,0.4)] hover:shadow-lg hover:-translate-y-0.5 transition-all ${isActive ? '' : 'opacity-50 pointer-events-none'}">
+                        <i data-lucide="cloud-upload" class="w-5 h-5"></i> 
+                        <div class="flex flex-col text-left">
+                            <span class="leading-none uppercase tracking-widest mb-0.5">Submit Monthly Reports</span>
+                            <span class="text-[10px] text-blue-100 font-medium leading-none">ສົ່ງບົດລາຍງານ ແລະ ເອກະສານ</span>
+                        </div>
                     </a>
-                    ${!isActive ? `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>` : ''}
+                    ${!isActive ? `<p class="text-red-500 font-medium text-xs mt-3 bg-red-50 inline-block px-3 py-1 rounded-md border border-red-100">Link not configured</p>` : ''}
                 `;
             }
             
-            document.getElementById('deptUploadBox').innerHTML = `
-                <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100 shadow-sm">
-                    <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
-                </div>
-                <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
-                <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
-                ${uploadHtml}
-            `;
+            document.getElementById('deptUploadBox').className = "mt-12 text-center pb-12";
+            document.getElementById('deptUploadBox').innerHTML = uploadHtml;
 
             lucide.createIcons();
             window.switchView('department');
