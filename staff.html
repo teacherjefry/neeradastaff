@@ -677,33 +677,23 @@
         lucide.createIcons();
 
         // ==========================================
-        // PUT YOUR FIREBASE CONFIG HERE
-        // (If running outside of an injected environment)
+        // FIREBASE CONFIGURATION
         // ==========================================
-       const firebaseConfig = {
-  apiKey: "AIzaSyCEhPAihBEmPfAQB27IRLhoG2djLFIzapE",
-  authDomain: "nrdstaff-c8785.firebaseapp.com",
-  projectId: "nrdstaff-c8785",
-  storageBucket: "nrdstaff-c8785.firebasestorage.app",
-  messagingSenderId: "96735187660",
-  appId: "1:96735187660:web:34655058a30314275ba869"
-};
-
-
-        // Determine if we should use custom config or injected canvas config
-        const isCustomConfig = customFirebaseConfig.apiKey !== "YOUR_API_KEY";
-        const firebaseConfig = isCustomConfig ? customFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "mock-key-for-local-test",
-            projectId: "mock-project-for-local-test",
-        });
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEhPAihBEmPfAQB27IRLhoG2djLFIzapE",
+            authDomain: "nrdstaff-c8785.firebaseapp.com",
+            projectId: "nrdstaff-c8785",
+            storageBucket: "nrdstaff-c8785.firebasestorage.app",
+            messagingSenderId: "96735187660",
+            appId: "1:96735187660:web:34655058a30314275ba869"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Secure Paths
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada_portal_db';
-        const getColPath = (col) => `artifacts/${appId}/public/data/${col}`;
+        // Secure Paths - Using a dedicated namespace for this app
+        const getColPath = (col) => `nrd_portal/public/data/${col}`;
 
         // --- Data & State ---
         let state = {
