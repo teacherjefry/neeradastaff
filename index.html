@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neerada School | Staff Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Elegant & Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Noto+Sans+Lao:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Lao', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                        aesthetic: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#005bc5',
+                            darkblue: '#004291',
+                            green: '#00a843',
+                            darkgreen: '#008535',
+                            yellow: '#eab308',
+                            orange: '#f97316',
+                        }
+                    },
+                    boxShadow: {
+                        'elegant': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'btn': '0 4px 14px 0 rgba(0, 91, 197, 0.2)',
+                        'glow': '0 0 30px 5px rgba(99, 102, 241, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Breathing Gradient Body Background */
+        @keyframes gradient-breath {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .breathing-bg {
+            background: linear-gradient(-45deg, #e0f2fe, #f0fdf4, #fdf4ff, #e0e7ff, #fefce8);
+            background-size: 400% 400%;
+            animation: gradient-breath 18s ease infinite;
+        }
+
+        body { 
+            overflow-x: hidden; 
+            color: #334155; 
+        }
+        
+        /* Smooth transitions for views */
+        .view-section { display: none; animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Background Overlay */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 66, 145, 0.85), rgba(0, 30, 80, 0.95)), url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Modal & Overlay Background */
+        .modal-bg {
+            background-color: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Hide scrollbar for menu tabs but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Drag and Drop styles */
+        .draggable-item.dragging { opacity: 0.5; background-color: #f8fafc; }
+        .draggable-item.drag-over { border-top: 2px solid #005bc5; background-color: #eff6ff; }
+        
+        /* Loading Overlay */
+        #firebaseLoading { transition: opacity 0.5s ease; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col breathing-bg">
+
+    <!-- FIREBASE INITIAL LOADING OVERLAY -->
+    <div id="firebaseLoading" class="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center">
+        <i data-lucide="loader-2" class="w-12 h-12 text-brand-blue animate-spin mb-4"></i>
+        <h2 class="font-heading font-bold text-xl text-gray-800 tracking-wider uppercase">Connecting to Database...</h2>
+    </div>
+
+    <!-- FULL SCREEN ANNOUNCEMENT POPUP -->
+    <div id="announcementModal" class="fixed inset-0 z-[100] hero-bg flex items-center justify-center hidden opacity-0 transition-opacity duration-500 overflow-y-auto">
+        <div class="relative z-10 bg-white/95 backdrop-blur-xl rounded-3xl w-[95%] max-w-2xl p-8 md:p-12 shadow-2xl border border-white/20 flex flex-col items-center transform scale-95 transition-transform duration-500 my-8" id="announcementBox">
+            
+            <div class="bg-brand-orange/10 p-4 rounded-full mb-6">
+                <i data-lucide="bell" class="w-10 h-10 text-brand-orange animate-pulse"></i>
+            </div>
+            
+            <h2 class="font-heading text-3xl md:text-4xl font-bold uppercase tracking-widest text-brand-blue mb-1 text-center">Important Notice</h2>
+            <div class="font-bold text-xl md:text-2xl text-brand-blue/80 mb-2 text-center tracking-wide">ແຈ້ງການສຳຄັນ</div>
+            <div class="font-aesthetic italic text-xl text-gray-500 mb-8 text-center">Neerada School</div>
+            
+            <div class="w-full bg-gray-50/50 p-6 md:p-8 rounded-2xl border border-gray-100 mb-10 shadow-inner">
+                <p id="popupText" class="text-lg text-gray-700 font-medium whitespace-pre-line leading-relaxed text-center"></p>
+            </div>
+            
+            <button onclick="closeAnnouncement()" class="w-full md:w-auto px-12 py-4 bg-brand-blue text-white font-semibold text-lg rounded-full shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all tracking-wide">
+                Enter Portal
+            </button>
+        </div>
+    </div>
+
+    <!-- ADD EVENT MODAL (Triggered from Calendar) -->
+    <div id="eventModal" class="fixed inset-0 z-[90] modal-bg flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-[90%] max-w-sm p-8 relative shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-300" id="eventBox">
+            <button onclick="closeEventModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-50 p-2 rounded-lg text-brand-blue"><i data-lucide="calendar-plus" class="w-5 h-5"></i></div>
+                <h2 class="font-heading text-xl font-bold text-gray-900">Add Event</h2>
+            </div>
+            <p id="eventDateLabel" class="text-sm font-medium text-gray-500 mb-6 bg-gray-50 inline-block px-3 py-1 rounded-md border border-gray-100">Date: </p>
+
+            <input type="text" id="eventTitle" placeholder="Event Title..." class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 mb-4 transition-colors">
+            
+            <label class="flex items-center gap-3 mb-6 cursor-pointer group p-3.5 border border-gray-100 rounded-xl hover:bg-red-50/50 transition-colors">
+                <input type="checkbox" id="eventIsHoliday" class="w-5 h-5 text-red-500 rounded border-gray-300 cursor-pointer">
+                <span class="text-sm font-medium text-gray-700 group-hover:text-red-600 transition-colors">Mark as Holiday (Red)</span>
+            </label>
+
+            <button onclick="saveNewEvent()" class="w-full bg-brand-blue text-white font-semibold text-sm py-3.5 rounded-xl shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                Save to Calendar
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm border-b border-white/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- Left Side: Burger Menu + Logo -->
+                <div class="flex items-center gap-4">
+                    <!-- Burger Menu Button -->
+                    <button onclick="toggleSideMenu()" class="bg-white text-brand-blue hover:bg-gray-50 border border-brand-blue/20 p-2.5 rounded-xl shadow-sm transition-all hover:scale-105">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3 cursor-pointer group ml-2" onclick="navigateAndClose('home')">
+                        <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                        </div>
+                        <span class="font-heading font-extrabold text-2xl tracking-tight text-gray-900 uppercase hidden sm:block">Neerada</span>
+                    </div>
+                </div>
+
+                <!-- Right Controls: Admin -->
+                <div class="flex items-center gap-4">
+                    <button onclick="openLoginModal()" id="headerLoginBtn" class="hidden sm:flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide shadow-sm hover:shadow transition-all">
+                        <i data-lucide="shield" class="w-4 h-4 text-brand-blue"></i> Admin Access
+                    </button>
+                    <button onclick="logoutAdmin()" id="headerLogoutBtn" class="hidden sm:flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 px-6 py-2.5 rounded-full font-semibold text-sm tracking-wide shadow-sm hover:shadow transition-all">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDE DRAWER MENU (Slides from Left) -->
+    <div id="menuOverlay" onclick="toggleSideMenu()" class="fixed inset-0 modal-bg z-50 hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <div id="sideMenu" class="fixed inset-y-0 left-0 w-full sm:w-[400px] bg-white/95 backdrop-blur-xl shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col border-r border-white/50">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <span class="font-heading font-bold text-xl text-gray-900 tracking-wide">Navigation</span>
+            <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-6 space-y-2">
+            <button onclick="navigateAndClose('home')" class="w-full text-left font-medium text-gray-700 p-4 rounded-xl hover:bg-brand-blue/5 hover:text-brand-blue transition-colors flex items-center gap-4">
+                <i data-lucide="home" class="w-5 h-5 text-gray-400"></i> Home
+            </button>
+
+            <!-- Sibounheuang Accordion -->
+            <div>
+                <button onclick="toggleAccordion('acc-sib')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-4"><i data-lucide="school" class="w-5 h-5 text-brand-blue opacity-80"></i> Sibounheuang</div>
+                    <i id="acc-sib-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
+                </button>
+                <div id="acc-sib" class="hidden pl-12 pr-4 py-2 space-y-1">
+                    <button onclick="loadDeptAndClose('sib_kg', 'Sibounheuang - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('sib_pri', 'Sibounheuang - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('sib_sec', 'Sibounheuang - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('sib_eng', 'Sibounheuang - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                </div>
+            </div>
+
+            <!-- Chommany Accordion -->
+            <div>
+                <button onclick="toggleAccordion('acc-chom')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-4"><i data-lucide="building-2" class="w-5 h-5 text-brand-green opacity-80"></i> Chommany</div>
+                    <i id="acc-chom-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
+                </button>
+                <div id="acc-chom" class="hidden pl-12 pr-4 py-2 space-y-1">
+                    <button onclick="loadDeptAndClose('chom_kg', 'Chommany - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('chom_pri', 'Chommany - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('chom_sec', 'Chommany - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('chom_eng', 'Chommany - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                </div>
+            </div>
+
+            <!-- Navigate To Accordion -->
+            <div>
+                <button onclick="toggleAccordion('acc-nav')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-4"><i data-lucide="compass" class="w-5 h-5 text-brand-orange opacity-80"></i> Resources</div>
+                    <i id="acc-nav-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
+                </button>
+                <div id="acc-nav" class="hidden pl-12 pr-4 py-2 space-y-1">
+                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Incident Report</a>
+                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Request Form</a>
+                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Monthly Highlights</a>
+                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Payslip</a>
+                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Neerada e-Library</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Footer (Login) -->
+        <div class="p-6 border-t border-gray-100 bg-gray-50/50">
+            <button onclick="openLoginModalFromMenu()" id="drawerLoginBtn" class="w-full bg-brand-blue text-white py-3.5 rounded-xl font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">
+                <i data-lucide="shield" class="w-4 h-4"></i> Admin Login
+            </button>
+            <button onclick="logoutAdminFromMenu()" id="drawerLogoutBtn" class="hidden w-full bg-white text-red-600 border border-red-100 py-3.5 rounded-xl font-semibold text-sm tracking-wide hover:bg-red-50 transition-all flex justify-center items-center gap-2 shadow-sm">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="loginModal" class="fixed inset-0 z-[80] modal-bg flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-[90%] max-w-sm p-8 relative shadow-2xl border border-gray-100 transform scale-95 transition-transform duration-300" id="loginBox">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="text-center mb-8 mt-4">
+                <div class="bg-gray-50 text-brand-blue w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-gray-100 shadow-sm">
+                    <i data-lucide="lock" class="w-7 h-7"></i>
+                </div>
+                <h2 class="font-heading text-2xl font-bold text-gray-900 tracking-tight">Admin Access</h2>
+                <p class="text-sm text-gray-500 mt-1">Please enter your secure PIN</p>
+            </div>
+            <input type="password" id="adminPassword" placeholder="••••" class="w-full text-center text-3xl tracking-[0.5em] font-medium border border-gray-200 rounded-xl p-4 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 bg-gray-50 transition-all mb-4">
+            <p id="loginError" class="text-red-500 font-medium text-sm text-center mb-4 hidden bg-red-50 p-3 rounded-lg border border-red-100">Incorrect PIN. Please try again.</p>
+            <button onclick="checkLogin()" class="w-full bg-gray-900 text-white font-semibold text-sm py-4 rounded-xl shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all tracking-wide">
+                Unlock Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow">
+        
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section active">
+            <!-- Hero -->
+            <div class="hero-bg text-white pt-20 pb-20 px-4 text-center relative overflow-hidden flex flex-col items-center justify-center rounded-b-[3rem] shadow-elegant mx-auto max-w-[1600px] mb-12">
+                <div class="absolute inset-0 bg-brand-blue/20 mix-blend-multiply pointer-events-none"></div>
+                <div class="max-w-4xl mx-auto relative z-10 flex flex-col items-center">
+                    
+                    <div class="font-aesthetic italic text-3xl md:text-5xl text-brand-yellow/90 mb-4 drop-shadow-sm font-light">
+                        Neerada School
+                    </div>
+                    
+                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-widest mb-6 drop-shadow-lg leading-tight text-white/95">
+                        Staff Hub
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl font-normal text-gray-100 max-w-2xl mx-auto drop-shadow bg-white/10 backdrop-blur-md px-8 py-5 rounded-3xl border border-white/20 leading-relaxed">
+                        Access resources, manage info, and stay updated.
+                        <span class="block mt-2 text-base text-gray-300 font-medium tracking-wide">ເຂົ້າເຖິງຂໍ້ມູນ, ຊັບພະຍາກອນ ແລະ ຂ່າວສານໃໝ່ໆຂອງໂຮງຮຽນ.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 space-y-12 mb-16 relative z-20">
+                
+                <!-- Giant Announcement Board -->
+                <div id="homeAnnouncementBlock" class="hidden w-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-[2.5rem] p-1 shadow-elegant relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+                    <div class="bg-white/95 backdrop-blur-xl rounded-[2.3rem] p-8 md:p-12 relative overflow-hidden h-full flex flex-col md:flex-row items-center gap-8">
+                        <div class="absolute -right-20 -top-20 text-yellow-500/10 pointer-events-none">
+                            <i data-lucide="megaphone" class="w-96 h-96"></i>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 p-5 rounded-3xl shadow-lg text-white flex-shrink-0">
+                            <i data-lucide="bell-ring" class="w-10 h-10 md:w-14 md:h-14 animate-pulse"></i>
+                        </div>
+                        
+                        <div class="text-center md:text-left z-10 w-full">
+                            <h2 class="font-heading text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600 tracking-wide mb-1 uppercase">Important Notice Board</h2>
+                            <div class="text-orange-500 font-bold text-lg md:text-xl mb-4 tracking-wide">ກະດານແຈ້ງການສຳຄັນ</div>
+                            <div class="w-20 h-1.5 bg-yellow-400 rounded-full mb-6 mx-auto md:mx-0"></div>
+                            <p id="homeAnnouncementText" class="text-lg md:text-xl text-gray-800 font-medium whitespace-pre-line leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout: Calendar & Countdown -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <!-- Countdown Timer (Aesthetic & Colorful) -->
+                    <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 rounded-[2.5rem] shadow-glow border border-white/10 p-8 md:p-12 text-center relative overflow-hidden text-white flex flex-col justify-center h-full">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                        <div class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="bg-white/20 backdrop-blur-md w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/30 text-white shadow-lg">
+                                <i data-lucide="calendar-clock" class="w-8 h-8"></i>
+                            </div>
+                            
+                            <h2 class="font-heading text-2xl md:text-3xl font-bold uppercase tracking-widest mb-2 drop-shadow-md">
+                                Report Submission
+                            </h2>
+                            <p class="text-indigo-100 font-medium text-lg mb-8 tracking-wide">ສົ່ງບົດລາຍງານ (Due <span id="targetDateDisplay">the 20th</span>)</p>
+                            
+                            <div class="flex flex-wrap justify-center gap-3 md:gap-5">
+                                <div class="flex flex-col items-center">
+                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <span id="cd-days" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
+                                    </div>
+                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Days <span class="block text-[10px] font-normal mt-0.5 opacity-70">ມື້</span></span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <span id="cd-hours" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
+                                    </div>
+                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Hrs <span class="block text-[10px] font-normal mt-0.5 opacity-70">ຊົ່ວໂມງ</span></span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <span id="cd-mins" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
+                                    </div>
+                                    <span class="mt-4 font-semibold text-white/80 uppercase tracking-widest text-xs">Mins <span class="block text-[10px] font-normal mt-0.5 opacity-70">ນາທີ</span></span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="bg-white/20 backdrop-blur-md border border-white/40 text-white w-20 h-24 md:w-24 md:h-28 rounded-2xl flex items-center justify-center shadow-lg transform scale-105">
+                                        <span id="cd-secs" class="font-heading text-4xl md:text-5xl font-bold drop-shadow">00</span>
+                                    </div>
+                                    <span class="mt-4 font-bold text-white uppercase tracking-widest text-xs drop-shadow-sm">Secs <span class="block text-[10px] font-normal mt-0.5 opacity-90">ວິນາທີ</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- School Calendar Card (Aesthetic & Colorful) -->
+                    <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-elegant p-4 md:p-8 flex flex-col h-full relative group overflow-hidden">
+                        
+                        <!-- Calendar Header -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white p-2 md:p-3 rounded-xl shadow-md">
+                                    <i data-lucide="calendar" class="w-5 h-5 md:w-6 md:h-6"></i>
+                                </div>
+                                <h3 id="calMonthYear" class="font-aesthetic font-bold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-indigo-600 tracking-wide capitalize">Month 2026</h3>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="changeCalendarMonth(-1)" class="p-2.5 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors text-gray-600"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button onclick="changeCalendarMonth(1)" class="p-2.5 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors text-gray-600"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Grid Headings -->
+                        <div class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-3">
+                            <div class="text-[10px] md:text-xs font-bold text-red-600 bg-red-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Su</div>
+                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Mo</div>
+                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Tu</div>
+                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">We</div>
+                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Th</div>
+                            <div class="text-[10px] md:text-xs font-bold text-blue-700 bg-blue-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Fr</div>
+                            <div class="text-[10px] md:text-xs font-bold text-purple-600 bg-purple-100 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Sa</div>
+                        </div>
+                        
+                        <!-- Calendar Days Grid -->
+                        <div id="calGrid" class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-6">
+                            <!-- Days populated by JS -->
+                        </div>
+
+                        <!-- Event Summary List -->
+                        <div class="flex-grow bg-gray-50/80 rounded-2xl p-4 border border-gray-100 overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-3 sticky top-0">
+                                <h4 class="text-sm font-bold text-gray-700 tracking-wide uppercase">Monthly Events</h4>
+                                <span class="text-[10px] text-gray-400 font-medium bg-white px-2 py-0.5 rounded-md border border-gray-100 shadow-sm"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-brand-blue font-bold ml-1">•</span> Event</span>
+                            </div>
+                            <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar">
+                                <!-- Events populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Column Weekly Menu Table -->
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-elegant p-6 md:p-10 flex flex-col overflow-hidden">
+                    <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row items-center gap-5">
+                            <div class="bg-gradient-to-tr from-green-400 to-emerald-500 text-white p-4 rounded-2xl shadow-lg">
+                                <i data-lucide="utensils-crossed" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-heading text-3xl font-extrabold text-gray-900 tracking-tight">Weekly Menu <span class="text-brand-green">Overview</span></h2>
+                                <span class="text-gray-500 font-medium text-base mt-1 block">ລາຍການອາຫານປະຈຳອາທິດ</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Aesthetic Date Range Badge -->
+                        <div class="inline-flex items-center gap-2.5 bg-white/60 backdrop-blur-md border border-green-200/60 text-brand-green px-5 py-3 rounded-full shadow-sm">
+                            <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                            <span id="weeklyMenuDateRangeText" class="font-semibold text-sm tracking-wide">Loading dates...</span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm bg-white">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-gray-50/80 border-b border-gray-200">
+                                    <th class="py-5 px-6 font-heading font-bold text-gray-700 uppercase tracking-wider text-sm w-1/4">Date / ມື້</th>
+                                    <th class="py-5 px-6 font-heading font-bold text-gray-700 uppercase tracking-wider text-sm w-3/8 border-l border-gray-200">ເມນູພາສາລາວ (Lao)</th>
+                                    <th class="py-5 px-6 font-heading font-bold text-gray-700 uppercase tracking-wider text-sm w-3/8 border-l border-gray-200">English Menu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="homeMenuTableBody">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW: DEPARTMENT -->
+        <section id="view-department" class="view-section py-16 px-4 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-gray-200/50 pb-8 gap-4 text-center md:text-left">
+                <div>
+                    <span class="text-brand-blue font-semibold tracking-widest uppercase text-xs mb-2 block">Department Roster</span>
+                    <h1 id="deptTitle" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Department Name</h1>
+                </div>
+            </div>
+
+            <div id="teacherGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+                <!-- Teacher Cards -->
+            </div>
+
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant">
+                <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100">
+                    <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
+                </div>
+                <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
+                <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
+                <a id="deptDriveLink" href="#" target="_blank" class="inline-block bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    Open Google Drive
+                </a>
+                <p id="noDriveWarning" class="text-red-500 font-medium text-sm mt-6 hidden bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN DASHBOARD -->
+        <section id="view-admin" class="view-section py-16 px-4 max-w-7xl mx-auto hidden">
+            <div class="mb-12 border-b border-gray-300 pb-8">
+                <span class="text-brand-green font-semibold tracking-widest uppercase text-xs mb-2 block">Management</span>
+                <h1 class="font-heading text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                
+                <!-- COL 1: Home Page Content -->
+                <div class="space-y-8">
+                    
+                    <!-- Announcement Form -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-yellow-50 p-2.5 rounded-lg border border-yellow-100"><i data-lucide="megaphone" class="text-yellow-600 w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Global Announcement</h2>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">This shows as a full-screen popup and large board when users open the portal.</p>
+                        <textarea id="adminAnnouncement" rows="3" class="w-full border border-gray-200 rounded-xl p-4 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none mb-4 text-gray-700 bg-gray-50 transition-colors" placeholder="Type announcement here. Leave blank to disable popup."></textarea>
+                        <button onclick="saveAnnouncement()" class="w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+                            Save Announcement
+                        </button>
+                    </div>
+
+                    <!-- Weekly Menu Form (All days at once) -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-green-50 p-2.5 rounded-lg border border-green-100"><i data-lucide="utensils" class="text-brand-green w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Weekly Menu Editor</h2>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <!-- Monday -->
+                            <div class="bg-yellow-50 p-4 rounded-2xl border border-yellow-100">
+                                <h3 class="font-bold text-yellow-800 mb-3 text-sm uppercase tracking-wide">Monday / ຈັນ</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <textarea id="menu_monday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white"></textarea>
+                                    <textarea id="menu_monday_eng" rows="2" placeholder="English Menu..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white"></textarea>
+                                </div>
+                            </div>
+                            <!-- Tuesday -->
+                            <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+                                <h3 class="font-bold text-pink-800 mb-3 text-sm uppercase tracking-wide">Tuesday / ອັງຄານ</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <textarea id="menu_tuesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"></textarea>
+                                    <textarea id="menu_tuesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"></textarea>
+                                </div>
+                            </div>
+                            <!-- Wednesday -->
+                            <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                                <h3 class="font-bold text-green-800 mb-3 text-sm uppercase tracking-wide">Wednesday / ພຸດ</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <textarea id="menu_wednesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white"></textarea>
+                                    <textarea id="menu_wednesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white"></textarea>
+                                </div>
+                            </div>
+                            <!-- Thursday -->
+                            <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                                <h3 class="font-bold text-orange-800 mb-3 text-sm uppercase tracking-wide">Thursday / ພະຫັດ</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <textarea id="menu_thursday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white"></textarea>
+                                    <textarea id="menu_thursday_eng" rows="2" placeholder="English Menu..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white"></textarea>
+                                </div>
+                            </div>
+                            <!-- Friday -->
+                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                <h3 class="font-bold text-blue-800 mb-3 text-sm uppercase tracking-wide">Friday / ສຸກ</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <textarea id="menu_friday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white"></textarea>
+                                    <textarea id="menu_friday_eng" rows="2" placeholder="English Menu..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="saveAllMenus()" class="w-full mt-6 bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-center items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Save Full Week Menu
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COL 2: Staff & Links -->
+                <div class="space-y-8">
+                    
+                    <!-- Add/Edit Teacher Form -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8" id="teacherFormContainer">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-indigo-50 p-2.5 rounded-lg border border-indigo-100" id="teacherFormIconBg"><i data-lucide="user-plus" id="teacherFormIcon" class="text-indigo-600 w-5 h-5"></i></div>
+                            <h2 id="teacherFormTitle" class="font-heading text-lg font-bold text-gray-900">Add Teacher</h2>
+                        </div>
+                        <div class="space-y-4">
+                            <select id="tDept" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700 cursor-pointer">
+                                <option value="sib_kg">Sibounheuang - Kindergarten</option>
+                                <option value="sib_pri">Sibounheuang - Primary</option>
+                                <option value="sib_sec">Sibounheuang - Secondary</option>
+                                <option value="sib_eng">Sibounheuang - English</option>
+                                <option value="chom_kg">Chommany - Kindergarten</option>
+                                <option value="chom_pri">Chommany - Primary</option>
+                                <option value="chom_sec">Chommany - Secondary</option>
+                                <option value="chom_eng">Chommany - English</option>
+                            </select>
+                            <input type="text" id="tName" placeholder="Teacher Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+                            <div class="flex gap-4">
+                                <input type="text" id="tLevel" placeholder="Level (P1)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
+                                <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
+                            </div>
+                            
+                            <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
+                                <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 400)">
+                                <div id="teacherImgPreviewContainer" class="hidden flex flex-col items-center">
+                                    <img id="teacherImgPreview" class="w-16 h-16 object-cover rounded-full border border-gray-200 mb-3 shadow-sm">
+                                    <span class="text-xs font-medium text-indigo-600">Photo Selected</span>
+                                </div>
+                                <div id="teacherImgPreviewPlaceholder" class="text-gray-400">
+                                    <i data-lucide="camera" class="w-6 h-6 mx-auto mb-2 text-gray-300 group-hover:text-indigo-600 transition-colors"></i>
+                                    <span class="text-sm font-medium">Upload Photo</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 pt-2">
+                                <button id="saveTeacherBtn" onclick="submitTeacherForm()" class="w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+                                    Add to Roster
+                                </button>
+                                <button id="cancelEditBtn" onclick="cancelEditTeacher()" class="hidden bg-white text-gray-500 border border-gray-200 font-semibold text-sm px-5 py-3.5 rounded-xl shadow-sm hover:bg-gray-50 transition-all">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Teachers List (Drag & Drop) -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8 flex flex-col max-h-[550px]">
+                        <div class="flex flex-col sm:flex-row justify-between mb-6 gap-4 items-start sm:items-center">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200"><i data-lucide="users" class="text-gray-600 w-5 h-5"></i></div>
+                                <div>
+                                    <h2 class="font-heading text-lg font-bold text-gray-900">Roster</h2>
+                                    <p class="text-[10px] text-gray-400 font-medium">Drag grip to reorder</p>
+                                </div>
+                            </div>
+                            <select id="filterDept" onchange="renderAdminTeachers()" class="border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-none focus:border-brand-blue bg-gray-50 text-gray-700 cursor-pointer">
+                                <option value="all">All Depts</option>
+                                <option value="sib_kg">Sib - KG</option><option value="sib_pri">Sib - Pri</option><option value="sib_sec">Sib - Sec</option><option value="sib_eng">Sib - Eng</option>
+                                <option value="chom_kg">Chom - KG</option><option value="chom_pri">Chom - Pri</option><option value="chom_sec">Chom - Sec</option><option value="chom_eng">Chom - Eng</option>
+                            </select>
+                        </div>
+                        <div class="overflow-y-auto pr-2 space-y-2 flex-grow" id="adminTeacherList"></div>
+                    </div>
+
+                    <!-- Drive Links Manager -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200"><i data-lucide="link" class="text-gray-600 w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Drive Links</h2>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4" id="adminLinksContainer"></div>
+                        <button onclick="saveDriveLinks()" class="mt-6 w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
+                            Save Links
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/40 backdrop-blur-md border-t border-gray-200/30 py-10 mt-auto relative z-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-3 mb-2 text-gray-600">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                <span class="font-heading font-semibold text-sm tracking-widest uppercase">Neerada School</span>
+            </div>
+            <p class="font-medium text-gray-500 text-xs">Teachers' Information Archive © 2025-2026</p>
+        </div>
+    </footer>
+
+    <!-- FIREBASE & INTERACTIVE LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        lucide.createIcons();
+
+        // ==========================================
+        // FIREBASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEhPAihBEmPfAQB27IRLhoG2djLFIzapE",
+            authDomain: "nrdstaff-c8785.firebaseapp.com",
+            projectId: "nrdstaff-c8785",
+            storageBucket: "nrdstaff-c8785.firebasestorage.app",
+            messagingSenderId: "96735187660",
+            appId: "1:96735187660:web:34655058a30314275ba869"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Secure Paths - Using a dedicated namespace for this app
+        const getColPath = (col) => `nrd_portal/public/data/${col}`;
+
+        // --- Data & State ---
+        let state = {
+            isLoggedIn: false,
+            announcement: '',
+            events: [], 
+            menu: {
+                monday: { lao: 'ເຂົ້າຜັດ', eng: 'Fried Rice' },
+                tuesday: { lao: 'ເຝີ', eng: 'Noodle Soup' },
+                wednesday: { lao: 'ແກງໄກ່', eng: 'Chicken Curry' },
+                thursday: { lao: 'ສະປາເກັດຕີ້', eng: 'Spaghetti' },
+                friday: { lao: 'ພິດຊ້າ', eng: 'Pizza Slice' }
+            },
+            teachers: [],
+            driveLinks: {
+                sib_kg: '', sib_pri: '', sib_sec: '', sib_eng: '',
+                chom_kg: '', chom_pri: '', chom_sec: '', chom_eng: ''
+            }
+        };
+
+        // UI State
+        let currentCalDate = new Date(); 
+        let displayMonth = currentCalDate.getMonth();
+        let displayYear = currentCalDate.getFullYear();
+        let pendingEventDateStr = null; 
+
+        let tempImages = { teacherImageState: null, featuredImageState: null };
+        let editingTeacherId = null;
+        let draggedTeacherId = null;
+
+        const deptNames = {
+            sib_kg: 'Sibounheuang - KG', sib_pri: 'Sibounheuang - Primary',
+            sib_sec: 'Sibounheuang - Secondary', sib_eng: 'Sibounheuang - English',
+            chom_kg: 'Chommany - KG', chom_pri: 'Chommany - Primary',
+            chom_sec: 'Chommany - Secondary', chom_eng: 'Chommany - English'
+        };
+
+        const menuTableStyles = {
+            monday: 'bg-yellow-50/70 border-yellow-200 text-yellow-900',
+            tuesday: 'bg-pink-50/70 border-pink-200 text-pink-900',
+            wednesday: 'bg-green-50/70 border-green-200 text-green-900',
+            thursday: 'bg-orange-50/70 border-orange-200 text-orange-900',
+            friday: 'bg-blue-50/70 border-blue-200 text-blue-900'
+        };
+
+        // --- Authentication & Initialization ---
+        async function initFirebase() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.warn("Auth initialization error. Operating locally if mocked.", error);
+                document.getElementById('firebaseLoading').style.opacity = '0';
+                setTimeout(() => document.getElementById('firebaseLoading').classList.add('hidden'), 500);
+                initLocalFallback();
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setupRealtimeListeners();
+            }
+        });
+
+        // Setup real-time connection to Firebase
+        function setupRealtimeListeners() {
+            const loading = document.getElementById('firebaseLoading');
+            
+            // Listen to General Settings (Announcement, Menu, Links)
+            onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    state.announcement = data.announcement || '';
+                    if (data.menu) state.menu = data.menu;
+                    if (data.driveLinks) state.driveLinks = data.driveLinks;
+                }
+                renderHomeContent();
+                
+                if(loading) {
+                    loading.style.opacity = '0';
+                    setTimeout(() => loading.classList.add('hidden'), 500);
+                }
+                
+                // Show Announcement logic
+                if (state.announcement && state.announcement.trim() !== '' && !sessionStorage.getItem('noticeShown')) {
+                    document.getElementById('popupText').innerText = state.announcement;
+                    const modal = document.getElementById('announcementModal');
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    void modal.offsetWidth; 
+                    modal.classList.remove('opacity-0');
+                    document.getElementById('announcementBox').classList.remove('scale-95');
+                    sessionStorage.setItem('noticeShown', 'true');
+                }
+            });
+
+            // Listen to Teachers
+            onSnapshot(collection(db, getColPath('portal_teachers')), (querySnapshot) => {
+                state.teachers = [];
+                querySnapshot.forEach((doc) => {
+                    state.teachers.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort by internal order
+                state.teachers.sort((a,b) => (a.order || 0) - (b.order || 0));
+                
+                if (document.getElementById('view-department').classList.contains('active')) {
+                    const currentTitle = document.getElementById('deptTitle').innerText;
+                    const currentKey = Object.keys(deptNames).find(key => deptNames[key] === currentTitle || deptNames[key].includes(currentTitle.split(' ')[0]));
+                    if(currentKey) window.showDepartment(currentKey, currentTitle);
+                }
+                window.renderAdminTeachers();
+            });
+
+            // Listen to Events
+            onSnapshot(collection(db, getColPath('portal_events')), (querySnapshot) => {
+                state.events = [];
+                querySnapshot.forEach((doc) => {
+                    state.events.push({ id: doc.id, ...doc.data() });
+                });
+                window.renderCalendar();
+            });
+        }
+
+        // Firebase Write Operations
+        async function fbSaveSettings() {
+            try {
+                await setDoc(doc(db, getColPath('portal_settings'), 'main'), {
+                    announcement: state.announcement,
+                    menu: state.menu,
+                    driveLinks: state.driveLinks
+                }, { merge: true });
+            } catch (e) { console.error("Error saving settings", e); alert("Error saving data to database."); }
+        }
+
+        async function fbAddTeacher(teacherData) {
+            try {
+                await addDoc(collection(db, getColPath('portal_teachers')), teacherData);
+            } catch (e) { console.error("Error adding teacher", e); alert("Failed to add. Image might be too large."); }
+        }
+
+        async function fbUpdateTeacher(id, teacherData) {
+            try {
+                await updateDoc(doc(db, getColPath('portal_teachers'), id), teacherData);
+            } catch (e) { console.error("Error updating teacher", e); alert("Failed to update."); }
+        }
+
+        async function fbDeleteTeacher(id) {
+            try {
+                await deleteDoc(doc(db, getColPath('portal_teachers'), id));
+            } catch (e) { console.error("Error deleting teacher", e); }
+        }
+
+        async function fbUpdateTeacherOrder() {
+            // Bulk update order
+            state.teachers.forEach((t, idx) => {
+                updateDoc(doc(db, getColPath('portal_teachers'), t.id), { order: idx }).catch(e=>{});
+            });
+        }
+
+        async function fbAddEvent(eventData) {
+            try {
+                await addDoc(collection(db, getColPath('portal_events')), eventData);
+            } catch (e) { console.error(e); }
+        }
+
+        async function fbDeleteEvent(id) {
+            try {
+                await deleteDoc(doc(db, getColPath('portal_events'), id));
+            } catch (e) { console.error(e); }
+        }
+
+        // Fallback for non-Firebase environments
+        function initLocalFallback() {
+            renderHomeContent();
+            window.renderCalendar();
+            initCountdown();
+        }
+
+        // ========================================================
+        // WINDOW BOUND FUNCTIONS (Required for ES Module context)
+        // ========================================================
+
+        function getWeekDates() {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            if (dayOfWeek === 0 || dayOfWeek === 6) monday.setDate(monday.getDate() + 7);
+
+            const dates = [];
+            for (let i = 0; i < 5; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                dates.push(d);
+            }
+            return dates;
+        }
+
+        window.closeAnnouncement = function() {
+            const m = document.getElementById('announcementModal');
+            m.classList.add('opacity-0'); 
+            document.getElementById('announcementBox').classList.add('scale-95');
+            document.body.style.overflow = '';
+            setTimeout(() => m.classList.add('hidden'), 500);
+        };
+
+        // --- CALENDAR LOGIC ---
+        window.changeCalendarMonth = function(direction) {
+            displayMonth += direction;
+            if (displayMonth < 0) { displayMonth = 11; displayYear--; }
+            else if (displayMonth > 11) { displayMonth = 0; displayYear++; }
+            window.renderCalendar();
+        };
+
+        window.handleDayClick = function(dateStr) {
+            if (!state.isLoggedIn) {
+                pendingEventDateStr = dateStr;
+                window.openLoginModal();
+            } else {
+                window.openEventModal(dateStr);
+            }
+        };
+
+        window.openEventModal = function(dateStr) {
+            pendingEventDateStr = dateStr;
+            const dateObj = new Date(dateStr + "T00:00:00");
+            const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('eventDateLabel').innerText = "Date: " + prettyDate;
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventIsHoliday').checked = false;
+            
+            const modal = document.getElementById('eventModal');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0');
+            document.getElementById('eventBox').classList.remove('scale-95');
+            document.getElementById('eventTitle').focus();
+        };
+
+        window.closeEventModal = function() {
+            const modal = document.getElementById('eventModal');
+            modal.classList.add('opacity-0'); 
+            document.getElementById('eventBox').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); pendingEventDateStr = null; }, 300);
+        };
+
+        window.saveNewEvent = function() {
+            const title = document.getElementById('eventTitle').value.trim();
+            if (!title) return alert("Please enter an event title.");
+            
+            const isHoliday = document.getElementById('eventIsHoliday').checked;
+            
+            fbAddEvent({
+                date: pendingEventDateStr,
+                title: title,
+                isHoliday: isHoliday
+            });
+            window.closeEventModal();
+        };
+
+        window.deleteEvent = function(id) {
+            if(confirm("Remove this event?")) {
+                fbDeleteEvent(id);
+            }
+        };
+
+        window.renderCalendar = function() {
+            const grid = document.getElementById('calGrid');
+            const list = document.getElementById('calEventList');
+            const monthYearLabel = document.getElementById('calMonthYear');
+
+            const firstDay = new Date(displayYear, displayMonth, 1).getDay();
+            const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+
+            monthYearLabel.innerText = new Date(displayYear, displayMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            grid.innerHTML = '';
+            let dayHtml = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                dayHtml += `<div class="p-1 md:p-2"></div>`;
+            }
+
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const currentCellDate = new Date(displayYear, displayMonth, i);
+                const dayOfWeek = currentCellDate.getDay();
+                const dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const isToday = (dateStr === todayStr);
+
+                const dayEvents = state.events.filter(e => e.date === dateStr);
+                const hasHoliday = dayEvents.some(e => e.isHoliday);
+                const hasRegular = dayEvents.some(e => !e.isHoliday);
+
+                let dotsHtml = '';
+                if (hasRegular && !hasHoliday) dotsHtml += `<div class="w-1.5 h-1.5 rounded-full bg-brand-blue shadow-sm mb-1"></div>`;
+                if (hasRegular && hasHoliday) dotsHtml += `<div class="w-1.5 h-1.5 rounded-full bg-white shadow-sm mb-1"></div>`;
+
+                let bgClass = '';
+                let textClass = 'text-sm md:text-base font-semibold';
+
+                if (hasHoliday) {
+                    bgClass = 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md transform scale-105 z-10 border border-red-400';
+                    textClass = 'text-xl md:text-2xl font-black drop-shadow-sm';
+                } else {
+                    if (isToday) {
+                        bgClass = 'bg-gradient-to-tr from-brand-blue to-indigo-500 text-white shadow-md border border-brand-blue/50';
+                        textClass = 'text-base md:text-lg font-bold';
+                    } else if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        bgClass = 'bg-purple-50/80 text-purple-800 hover:bg-purple-100 border border-purple-200/50';
+                    } else {
+                        bgClass = 'bg-blue-50/50 text-gray-700 hover:bg-blue-100 border border-blue-100/50';
+                    }
+                }
+
+                dayHtml += `
+                    <div onclick="handleDayClick('${dateStr}')" class="relative flex flex-col items-center justify-center p-1 md:p-2 rounded-xl transition-all cursor-pointer hover:shadow-md aspect-square ${bgClass}">
+                        <span class="${textClass} z-10">${i}</span>
+                        <div class="flex gap-0.5 absolute bottom-0.5 md:bottom-1 z-10">
+                            ${dotsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = dayHtml;
+
+            const monthEvents = state.events.filter(e => {
+                const eMonth = parseInt(e.date.split('-')[1]) - 1;
+                const eYear = parseInt(e.date.split('-')[0]);
+                return eMonth === displayMonth && eYear === displayYear;
+            }).sort((a,b) => a.date.localeCompare(b.date));
+
+            list.innerHTML = '';
+            if (monthEvents.length === 0) {
+                list.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">No events scheduled.</p>`;
+            } else {
+                monthEvents.forEach(e => {
+                    const dayNum = parseInt(e.date.split('-')[2]);
+                    const isHol = e.isHoliday;
+                    const styling = isHol ? 'bg-red-50 border-red-100 text-red-700' : 'bg-white border-gray-100 text-brand-blue';
+                    const icon = isHol ? 'calendar-off' : 'calendar-days';
+                    const titleColor = isHol ? 'text-red-800' : 'text-gray-800';
+
+                    let delBtn = state.isLoggedIn ? `<button onclick="deleteEvent('${e.id}')" class="ml-auto text-gray-400 hover:text-red-500 p-1 rounded hover:bg-white transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
+
+                    list.innerHTML += `
+                        <div class="flex items-center gap-3 p-3 rounded-xl border ${styling} shadow-sm group">
+                            <div class="font-bold w-6 text-center shrink-0 text-lg opacity-80">${dayNum}</div>
+                            <div class="h-6 w-px ${isHol ? 'bg-red-200' : 'bg-gray-200'}"></div>
+                            <i data-lucide="${icon}" class="w-5 h-5 opacity-70"></i>
+                            <span class="font-semibold text-sm ${titleColor} truncate">${e.title}</span>
+                            ${delBtn}
+                        </div>
+                    `;
+                });
+            }
+            lucide.createIcons();
+        };
+
+        // --- Render Main Content ---
+        function renderHomeContent() {
+            const annBlock = document.getElementById('homeAnnouncementBlock');
+            if (state.announcement && state.announcement.trim() !== '') {
+                document.getElementById('homeAnnouncementText').innerText = state.announcement;
+                annBlock.classList.remove('hidden');
+            } else {
+                annBlock.classList.add('hidden');
+            }
+
+            const weekDates = getWeekDates();
+            
+            const startMonth = weekDates[0].toLocaleDateString('en-US', { month: 'long' });
+            const startDay = weekDates[0].getDate();
+            const endMonth = weekDates[4].toLocaleDateString('en-US', { month: 'long' });
+            const endDay = weekDates[4].getDate();
+            const year = weekDates[4].getFullYear();
+            
+            let rangeStr = startMonth === endMonth 
+                ? `${startMonth} ${startDay} - ${endDay}, ${year}`
+                : `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+            
+            document.getElementById('weeklyMenuDateRangeText').innerText = rangeStr;
+
+            const dayNamesEn = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            const dayNamesLa = ['ຈັນ', 'ອັງຄານ', 'ພຸດ', 'ພະຫັດ', 'ສຸກ'];
+            const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+            const tbody = document.getElementById('homeMenuTableBody');
+            tbody.innerHTML = '';
+            
+            dayKeys.forEach((day, index) => {
+                const isLast = index === dayKeys.length - 1;
+                const rowClass = `${menuTableStyles[day]} ${isLast ? '' : 'border-b'}`;
+                const data = state.menu[day] || { lao: '-', eng: '-' };
+                
+                const dateStr = weekDates[index].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const dayLabel = `${dayNamesEn[index]}<span class="block text-xs font-normal opacity-70 mt-0.5">${dayNamesLa[index]} • ${dateStr}</span>`;
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass} hover:opacity-90 transition-opacity">
+                        <td class="py-4 px-6 font-heading font-bold text-sm border-r border-white/40 align-top w-1/4">${dayLabel}</td>
+                        <td class="py-4 px-6 font-semibold text-sm whitespace-pre-line border-r border-white/40 align-top w-3/8">${data.lao}</td>
+                        <td class="py-4 px-6 font-medium text-sm whitespace-pre-line align-top w-3/8 text-gray-700/90">${data.eng}</td>
+                    </tr>
+                `;
+            });
+            
+            lucide.createIcons();
+        }
+
+        // --- Admin Form Loading ---
+        window.loadAdminForms = function() {
+            document.getElementById('adminAnnouncement').value = state.announcement;
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            days.forEach(day => {
+                if(state.menu[day]) {
+                    document.getElementById(`menu_${day}_lao`).value = state.menu[day].lao || '';
+                    document.getElementById(`menu_${day}_eng`).value = state.menu[day].eng || '';
+                }
+            });
+            
+            window.renderAdminTeachers();
+            window.renderDriveLinksForm();
+        };
+
+        window.saveAllMenus = function() {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            days.forEach(day => {
+                state.menu[day].lao = document.getElementById(`menu_${day}_lao`).value.trim();
+                state.menu[day].eng = document.getElementById(`menu_${day}_eng`).value.trim();
+            });
+            fbSaveSettings();
+            alert('Full Weekly Menu Saved!');
+        };
+
+        window.saveAnnouncement = function() {
+            state.announcement = document.getElementById('adminAnnouncement').value;
+            fbSaveSettings();
+            alert("Announcement Saved!");
+        };
+
+        window.processImageUpload = function(event, stateKey, previewImgId, maxWidth = 800) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let width = img.width; let height = img.height;
+                    if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const base64 = canvas.toDataURL('image/jpeg', 0.6); 
+                    tempImages[stateKey] = base64;
+                    
+                    document.getElementById(previewImgId).src = base64;
+                    document.getElementById(previewImgId + 'Container').classList.remove('hidden');
+                    document.getElementById(previewImgId + 'Placeholder').classList.add('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // --- Admin Teacher Drag & Drop Logic ---
+        window.handleDragStart = function(e, id) {
+            draggedTeacherId = id;
+            e.dataTransfer.effectAllowed = 'move';
+            e.target.classList.add('dragging');
+        };
+        window.handleDragOver = function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; };
+        window.handleDragEnter = function(e) { e.preventDefault(); const item = e.target.closest('.draggable-item'); if (item) item.classList.add('drag-over'); };
+        window.handleDragLeave = function(e) { const item = e.target.closest('.draggable-item'); if (item) item.classList.remove('drag-over'); };
+        window.handleDrop = function(e, targetId) {
+            e.stopPropagation();
+            const item = e.target.closest('.draggable-item');
+            if (item) item.classList.remove('drag-over');
+            
+            if (draggedTeacherId && draggedTeacherId !== targetId) {
+                const draggedIdx = state.teachers.findIndex(t => t.id === draggedTeacherId);
+                const targetIdx = state.teachers.findIndex(t => t.id === targetId);
+                
+                if (draggedIdx > -1 && targetIdx > -1) {
+                    const [draggedItem] = state.teachers.splice(draggedIdx, 1);
+                    state.teachers.splice(targetIdx, 0, draggedItem);
+                    window.renderAdminTeachers(); // Update UI immediately
+                    fbUpdateTeacherOrder(); // Send batch updates
+                }
+            }
+            draggedTeacherId = null; return false;
+        };
+        window.handleDragEnd = function(e) { e.target.classList.remove('dragging'); draggedTeacherId = null; };
+
+        // --- Teacher CRUD ---
+        window.submitTeacherForm = function() {
+            const name = document.getElementById('tName').value.trim();
+            if (!name) return alert('Enter teacher name.');
+            
+            const level = document.getElementById('tLevel').value.trim();
+            const room = document.getElementById('tRoom').value.trim();
+            const department = document.getElementById('tDept').value;
+            const image = tempImages.teacherImageState;
+
+            const teacherData = { name, level, room, department, order: state.teachers.length };
+            if (image !== null) teacherData.image = image;
+
+            if (editingTeacherId) {
+                fbUpdateTeacher(editingTeacherId, teacherData);
+            } else {
+                fbAddTeacher(teacherData);
+            }
+            window.cancelEditTeacher();
+        };
+
+        window.editTeacher = function(id) {
+            const teacher = state.teachers.find(t => t.id === id);
+            if (!teacher) return;
+            
+            editingTeacherId = id;
+            document.getElementById('tName').value = teacher.name;
+            document.getElementById('tLevel').value = teacher.level || '';
+            document.getElementById('tRoom').value = teacher.room || '';
+            document.getElementById('tDept').value = teacher.department;
+            
+            tempImages.teacherImageState = null;
+            const previewContainer = document.getElementById('teacherImgPreviewContainer');
+            const placeholder = document.getElementById('teacherImgPreviewPlaceholder');
+            const imgEl = document.getElementById('teacherImgPreview');
+            
+            if (teacher.image) {
+                imgEl.src = teacher.image; previewContainer.classList.remove('hidden'); placeholder.classList.add('hidden');
+            } else {
+                imgEl.src = ''; previewContainer.classList.add('hidden'); placeholder.classList.remove('hidden');
+            }
+
+            document.getElementById('teacherFormTitle').innerText = 'Edit Teacher';
+            document.getElementById('teacherFormIcon').setAttribute('data-lucide', 'edit');
+            document.getElementById('saveTeacherBtn').innerText = 'Update Roster';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('teacherFormContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            lucide.createIcons();
+        };
+
+        window.cancelEditTeacher = function() {
+            editingTeacherId = null;
+            document.getElementById('tName').value = '';
+            document.getElementById('tLevel').value = '';
+            document.getElementById('tRoom').value = '';
+            document.getElementById('tDept').value = 'sib_kg';
+            
+            tempImages.teacherImageState = null;
+            document.getElementById('adminTeacherFileInput').value = '';
+            document.getElementById('teacherImgPreviewContainer').classList.add('hidden');
+            document.getElementById('teacherImgPreviewPlaceholder').classList.remove('hidden');
+
+            document.getElementById('teacherFormTitle').innerText = 'Add Teacher';
+            document.getElementById('teacherFormIcon').setAttribute('data-lucide', 'user-plus');
+            document.getElementById('saveTeacherBtn').innerText = 'Add to Roster';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            lucide.createIcons();
+        };
+
+        window.deleteTeacher = function(id) {
+            if (confirm("Remove teacher from roster?")) {
+                fbDeleteTeacher(id);
+                if (editingTeacherId === id) window.cancelEditTeacher();
+            }
+        };
+
+        window.renderAdminTeachers = function() {
+            const list = document.getElementById('adminTeacherList');
+            const filter = document.getElementById('filterDept').value;
+            list.innerHTML = '';
+            let filtered = filter === 'all' ? state.teachers : state.teachers.filter(t => t.department === filter);
+            
+            if(filtered.length === 0) { 
+                list.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm font-medium">No teachers found.</div>'; 
+                return; 
+            }
+            
+            filtered.forEach(t => {
+                const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f1f5f9&color=475569&bold=true';
+                list.innerHTML += `
+                    <div class="draggable-item flex items-center justify-between bg-white border border-gray-100 p-3 rounded-xl hover:border-brand-blue/30 shadow-sm transition-all"
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, '${t.id}')" 
+                         ondragover="handleDragOver(event)" 
+                         ondragenter="handleDragEnter(event)" 
+                         ondragleave="handleDragLeave(event)" 
+                         ondrop="handleDrop(event, '${t.id}')"
+                         ondragend="handleDragEnd(event)">
+                        
+                        <div class="flex items-center gap-3 w-full">
+                            <div class="cursor-grab text-gray-300 hover:text-gray-500 py-2"><i data-lucide="grip-vertical" class="w-5 h-5"></i></div>
+                            <img src="${pic}" class="w-10 h-10 rounded-full object-cover border border-gray-100 pointer-events-none">
+                            <div class="pointer-events-none overflow-hidden pr-2">
+                                <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate">${t.name}</h4>
+                                <div class="text-[10px] font-medium text-gray-500 uppercase truncate">${deptNames[t.department]} | Rm: ${t.room||'-'}</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5 flex-shrink-0">
+                            <button onclick="editTeacher('${t.id}')" class="text-gray-400 hover:text-brand-blue bg-gray-50 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteTeacher('${t.id}')" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+        };
+
+        window.renderDriveLinksForm = function() {
+            const container = document.getElementById('adminLinksContainer');
+            container.innerHTML = '';
+            for (const [key, name] of Object.entries(deptNames)) {
+                container.innerHTML += `
+                    <div class="flex flex-col"><label class="font-semibold text-gray-500 text-xs mb-1.5 ml-1">${name}</label>
+                    <input type="text" id="link_${key}" value="${state.driveLinks[key] || ''}" placeholder="https://drive.google.com/..." class="border border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none transition-all"></div>`;
+            }
+        };
+
+        window.saveDriveLinks = function() {
+            for (const key of Object.keys(deptNames)) state.driveLinks[key] = document.getElementById(`link_${key}`).value.trim();
+            fbSaveSettings();
+            alert("Links Saved!");
+        };
+
+        // --- Navigation / Menus ---
+        window.toggleSideMenu = function() {
+            const menu = document.getElementById('sideMenu'); const overlay = document.getElementById('menuOverlay');
+            if (menu.classList.contains('-translate-x-full')) {
+                overlay.classList.remove('hidden'); void overlay.offsetWidth; overlay.classList.remove('opacity-0');
+                menu.classList.remove('-translate-x-full'); document.body.style.overflow = 'hidden';
+            } else {
+                overlay.classList.add('opacity-0'); menu.classList.add('-translate-x-full');
+                document.body.style.overflow = ''; setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        };
+
+        window.toggleAccordion = function(id) {
+            const c = document.getElementById(id); const i = document.getElementById(id+'-icon');
+            if (c.classList.contains('hidden')) { c.classList.remove('hidden'); i.style.transform = 'rotate(180deg)'; }
+            else { c.classList.add('hidden'); i.style.transform = 'rotate(0deg)'; }
+        };
+
+        window.navigateAndClose = function(v) { window.toggleSideMenu(); setTimeout(() => window.switchView(v), 300); };
+        window.loadDeptAndClose = function(k, t) { window.toggleSideMenu(); setTimeout(() => window.showDepartment(k, t), 300); };
+
+        window.switchView = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active'); window.scrollTo(0, 0);
+            if (viewId === 'admin') {
+                if (!state.isLoggedIn) { window.openLoginModal(); window.switchView('home'); return; }
+                window.loadAdminForms();
+            }
+            if (viewId === 'home') {
+                window.renderCalendar(); 
+            }
+        };
+
+        window.showDepartment = function(deptKey, title) {
+            document.getElementById('deptTitle').innerText = title;
+            const grid = document.getElementById('teacherGrid'); grid.innerHTML = '';
+            const dt = state.teachers.filter(t => t.department === deptKey);
+            if (dt.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-16 bg-white/80 backdrop-blur-sm rounded-3xl border border-dashed border-gray-200"><i data-lucide="users" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i><p class="text-gray-400 font-medium text-lg">No teachers assigned</p></div>`;
+            } else {
+                dt.forEach(t => {
+                    const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f8fafc&color=334155&size=200&bold=true';
+                    grid.innerHTML += `
+                        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-card border border-white/40 overflow-hidden flex flex-col h-full group">
+                            <div class="h-48 bg-gray-50 relative overflow-hidden"><img src="${pic}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"><div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div><h3 class="absolute bottom-4 left-5 right-5 text-white font-heading font-bold text-xl truncate">${t.name}</h3></div>
+                            <div class="p-5 flex-grow flex flex-col gap-3">
+                                <div class="flex justify-between border-b border-gray-50 pb-2"><span class="text-gray-400 font-semibold uppercase text-xs">Level</span><span class="font-medium text-gray-700 text-sm">${t.level||'-'}</span></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-400 font-semibold uppercase text-xs">Room</span><span class="bg-brand-blue/10 text-brand-blue px-3 py-1 rounded-lg font-semibold text-sm">${t.room||'-'}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            const link = state.driveLinks[deptKey]; const btn = document.getElementById('deptDriveLink');
+            if (link && link.trim() !== '') {
+                btn.href = link.startsWith('http') ? link : 'https://'+link; btn.classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('noDriveWarning').classList.add('hidden');
+            } else {
+                btn.href = "#"; btn.classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('noDriveWarning').classList.remove('hidden');
+            }
+            window.switchView('department');
+        };
+
+        // --- Auth Modal ---
+        window.openLoginModalFromMenu = function() { window.toggleSideMenu(); setTimeout(window.openLoginModal, 300); };
+        window.openLoginModal = function() {
+            if (state.isLoggedIn) { window.switchView('admin'); return; }
+            const m = document.getElementById('loginModal'); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0');
+            document.getElementById('loginBox').classList.remove('scale-95'); document.getElementById('adminPassword').value = ''; document.getElementById('adminPassword').focus();
+        };
+        window.closeLoginModal = function() {
+            const m = document.getElementById('loginModal'); m.classList.add('opacity-0'); document.getElementById('loginBox').classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 300);
+            pendingEventDateStr = null;
+        };
+        window.checkLogin = function() {
+            if (document.getElementById('adminPassword').value === '0000') {
+                state.isLoggedIn = true; 
+                window.closeLoginModal();
+                
+                document.getElementById('headerLoginBtn').classList.add('hidden'); 
+                document.getElementById('headerLogoutBtn').classList.remove('hidden');
+                document.getElementById('drawerLoginBtn').classList.add('hidden'); 
+                document.getElementById('drawerLogoutBtn').classList.remove('hidden');
+                
+                window.renderCalendar();
+                
+                if (pendingEventDateStr) {
+                    setTimeout(() => window.openEventModal(pendingEventDateStr), 300);
+                } else {
+                    window.switchView('admin');
+                }
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        };
+        window.logoutAdminFromMenu = function() { window.toggleSideMenu(); setTimeout(window.logoutAdmin, 300); };
+        window.logoutAdmin = function() {
+            state.isLoggedIn = false;
+            document.getElementById('headerLoginBtn').classList.remove('hidden'); 
+            document.getElementById('headerLogoutBtn').classList.add('hidden');
+            document.getElementById('drawerLoginBtn').classList.remove('hidden'); 
+            document.getElementById('drawerLogoutBtn').classList.add('hidden');
+            
+            window.renderCalendar(); 
+            window.switchView('home');
+        };
+
+        // --- Countdown ---
+        function calculateNextTargetDate() {
+            const now = new Date(); let t = new Date(now.getFullYear(), now.getMonth(), 20, 23, 59, 59);
+            if (now > t) t.setMonth(t.getMonth() + 1);
+            if (t.getDay() === 6) t.setDate(19); else if (t.getDay() === 0) t.setDate(21);
+            return t;
+        }
+        function updateCountdown() {
+            const now = new Date(); const target = calculateNextTargetDate();
+            document.getElementById('targetDateDisplay').innerText = `Due: ${target.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+            const diff = target - now;
+            if (diff <= 0) return;
+            document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+            document.getElementById('cd-hours').innerText = Math.floor((diff / 3600000) % 24).toString().padStart(2, '0');
+            document.getElementById('cd-mins').innerText = Math.floor((diff / 60000) % 60).toString().padStart(2, '0');
+            document.getElementById('cd-secs').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+        }
+        function initCountdown() { updateCountdown(); setInterval(updateCountdown, 1000); }
+
+        initFirebase();
+    </script>
+</body>
+</html>
