@@ -671,7 +671,8 @@
     <!-- FIREBASE & INTERACTIVE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        // FIX #2: Imported signInWithCustomToken which was missing
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
@@ -679,23 +680,37 @@
         // ==========================================
         // FIREBASE CONFIGURATION
         // ==========================================
-        const firebaseConfig = {
-      const firebaseConfig = {
-  apiKey: "AIzaSyCPXbxPr0C_EtBx2tZAQfKCD4lo6ZnmQ00",
-  authDomain: "neerada-staff.firebaseapp.com",
-  projectId: "neerada-staff",
-  storageBucket: "neerada-staff.firebasestorage.app",
-  messagingSenderId: "214206577803",
-  appId: "1:214206577803:web:fdb10cf92f6a9087eca88e"
-};
+        let firebaseConfig;
 
+        // FIX #3: Contextual injection check so it works locally AND in preview platforms securely.
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            // FIX #1: Fixed the syntax error here (duplicate "const firebaseConfig = {")
+            firebaseConfig = {
+                apiKey: "AIzaSyCPXbxPr0C_EtBx2tZAQfKCD4lo6ZnmQ00",
+                authDomain: "neerada-staff.firebaseapp.com",
+                projectId: "neerada-staff",
+                storageBucket: "neerada-staff.firebasestorage.app",
+                messagingSenderId: "214206577803",
+                appId: "1:214206577803:web:fdb10cf92f6a9087eca88e"
+            };
+        }
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Secure Paths - Using a dedicated namespace for this app
-        const getColPath = (col) => `nrd_portal/public/data/${col}`;
+        // Secure Paths - Adapts to environment safely
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
+        const getColPath = (col) => {
+            if (typeof __app_id !== 'undefined') {
+                // Canvas preview environment
+                return `artifacts/${appId}/public/data/${col}`;
+            }
+            // Real production environment - writes directly to root collections
+            return col; 
+        };
 
         // --- Data & State ---
         let state = {
@@ -741,6 +756,8 @@
             friday: 'bg-blue-50/70 border-blue-200 text-blue-900'
         };
 
+        let announcementShown = false; // Memory variable replacing sessionStorage
+
         // --- Authentication & Initialization ---
         async function initFirebase() {
             try {
@@ -750,10 +767,10 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.warn("Auth initialization error. Operating locally if mocked.", error);
-                document.getElementById('firebaseLoading').style.opacity = '0';
-                setTimeout(() => document.getElementById('firebaseLoading').classList.add('hidden'), 500);
-                initLocalFallback();
+                console.error("Firebase Auth Error:", error);
+                const loading = document.getElementById('firebaseLoading');
+                loading.innerHTML = '<div class="text-center p-6"><i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i><h2 class="font-heading font-bold text-xl text-gray-800">Database Connection Failed</h2><p class="text-gray-500 mt-2">Please check your Firebase configuration and rules.</p></div>';
+                lucide.createIcons();
             }
         }
 
@@ -782,8 +799,8 @@
                     setTimeout(() => loading.classList.add('hidden'), 500);
                 }
                 
-                // Show Announcement logic
-                if (state.announcement && state.announcement.trim() !== '' && !sessionStorage.getItem('noticeShown')) {
+                // Show Announcement logic (Strictly memory-based, no local storage)
+                if (state.announcement && state.announcement.trim() !== '' && !announcementShown) {
                     document.getElementById('popupText').innerText = state.announcement;
                     const modal = document.getElementById('announcementModal');
                     modal.classList.remove('hidden');
@@ -791,7 +808,7 @@
                     void modal.offsetWidth; 
                     modal.classList.remove('opacity-0');
                     document.getElementById('announcementBox').classList.remove('scale-95');
-                    sessionStorage.setItem('noticeShown', 'true');
+                    announcementShown = true;
                 }
             });
 
@@ -868,13 +885,6 @@
             try {
                 await deleteDoc(doc(db, getColPath('portal_events'), id));
             } catch (e) { console.error(e); }
-        }
-
-        // Fallback for non-Firebase environments
-        function initLocalFallback() {
-            renderHomeContent();
-            window.renderCalendar();
-            initCountdown();
         }
 
         // ========================================================
