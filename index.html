@@ -208,18 +208,18 @@
             <div class="flex justify-between items-center h-20">
                 
                 <!-- Left Side: Burger Menu + Logo -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
                     <!-- Burger Menu Button -->
                     <button onclick="toggleSideMenu()" class="bg-white text-brand-blue hover:bg-gray-50 border border-brand-blue/20 p-2.5 rounded-xl shadow-sm transition-all hover:scale-105">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
 
                     <!-- Logo -->
-                    <div class="flex items-center gap-3 cursor-pointer group ml-2" onclick="window.switchView('home')">
+                    <div class="flex items-center gap-2 sm:gap-3 cursor-pointer group ml-1 sm:ml-2" onclick="window.switchView('home')">
                         <div class="bg-gradient-to-tr from-brand-blue to-brand-green text-white w-10 h-10 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300 flex items-center justify-center overflow-hidden" id="headerLogoContainer">
                             <i data-lucide="graduation-cap" class="w-6 h-6" id="headerLogoIcon"></i>
                         </div>
-                        <span class="font-heading font-extrabold text-2xl tracking-tight text-gray-900 uppercase hidden sm:block">Neerada</span>
+                        <span class="font-aesthetic font-normal text-xl sm:text-2xl tracking-tight text-gray-900 block ml-1 leading-none pt-1">Neerada School</span>
                     </div>
                 </div>
 
@@ -278,18 +278,14 @@
                 </div>
             </div>
 
-            <!-- Navigate To Accordion -->
+            <!-- Navigate To Accordion (Dynamic) -->
             <div>
                 <button onclick="toggleAccordion('acc-nav')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
                     <div class="flex items-center gap-4"><i data-lucide="compass" class="w-5 h-5 text-brand-orange opacity-80"></i> Resources</div>
                     <i id="acc-nav-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
                 </button>
                 <div id="acc-nav" class="hidden pl-12 pr-4 py-2 space-y-1">
-                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Incident Report</a>
-                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Request Form</a>
-                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Monthly Highlights</a>
-                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Payslip</a>
-                    <a href="#" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors">Neerada e-Library</a>
+                    <!-- Resources populated via JS -->
                 </div>
             </div>
         </div>
@@ -558,16 +554,8 @@
                     <!-- Teacher Cards -->
                 </div>
 
-                <div class="bg-white/80 backdrop-blur-md rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant">
-                    <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100 shadow-sm">
-                        <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
-                    </div>
-                    <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
-                    <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
-                    <a id="deptDriveLink" href="#" target="_blank" class="inline-block bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                        Open Google Drive
-                    </a>
-                    <p id="noDriveWarning" class="text-red-500 font-medium text-sm mt-6 hidden bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>
+                <div class="bg-white/80 backdrop-blur-md rounded-3xl p-10 md:p-14 border border-gray-100 text-center shadow-elegant" id="deptUploadBox">
+                    <!-- Will be dynamically populated for regular dept OR english dept -->
                 </div>
             </div>
         </section>
@@ -720,7 +708,6 @@
                             <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
                                 <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 400)">
                                 <div id="teacherImgPreviewContainer" class="hidden flex flex-col items-center">
-                                    <!-- Use object-contain and aspect-portrait logic for preview -->
                                     <img id="teacherImgPreview" class="w-16 h-20 object-contain rounded border border-gray-200 mb-3 shadow-sm bg-gray-100">
                                     <span class="text-xs font-medium text-indigo-600">Photo Selected</span>
                                 </div>
@@ -802,10 +789,32 @@
                             <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200"><i data-lucide="link" class="text-gray-600 w-5 h-5"></i></div>
                             <h2 class="font-heading text-lg font-bold text-gray-900">Department Drive Links</h2>
                         </div>
-                        <div class="grid grid-cols-1 gap-4" id="adminLinksContainer"></div>
+                        <p class="text-xs text-gray-500 mb-4">Set the master Google Drive folder links for each department.</p>
+                        <div class="grid grid-cols-1 gap-4 overflow-y-auto max-h-[400px] pr-2 no-scrollbar" id="adminLinksContainer"></div>
                         <button onclick="saveDriveLinks()" class="mt-6 w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
-                            Save Links
+                            Save Drive Links
                         </button>
+                    </div>
+
+                    <!-- Resources Links Manager -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-orange-50 p-2.5 rounded-lg border border-orange-100"><i data-lucide="compass" class="text-brand-orange w-5 h-5"></i></div>
+                            <h2 class="font-heading text-lg font-bold text-gray-900">Resources Menu Links</h2>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Manage the links that appear in the 'Resources' tab on the side menu.</p>
+                        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar" id="adminResourcesContainer">
+                            <!-- Populated via JS -->
+                        </div>
+                        
+                        <div class="mt-6 flex flex-col gap-3">
+                            <button onclick="addResourceLink()" class="w-full bg-orange-50 text-brand-orange border border-orange-200 font-semibold text-sm py-3 rounded-xl shadow-sm hover:bg-orange-100 transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Custom Resource Link
+                            </button>
+                            <button onclick="saveResourceLinks()" class="w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Save Resources
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -880,9 +889,19 @@
             },
             teachers: [],
             driveLinks: {
-                sib_kg: '', sib_pri: '', sib_sec: '', sib_eng: '',
-                chom_kg: '', chom_pri: '', chom_sec: '', chom_eng: ''
-            }
+                sib_kg: '', sib_pri: '', sib_sec: '',
+                sib_eng_kg: '', sib_eng_pri: '', sib_eng_sec: '',
+                chom_kg: '', chom_pri: '', chom_sec: '',
+                chom_eng_kg: '', chom_eng_pri: '', chom_eng_sec: ''
+            },
+            resources: [
+                { id: 'r_incident', name: 'Incident Report', url: '', isStatic: true },
+                { id: 'r_request', name: 'Request Form', url: '', isStatic: true },
+                { id: 'r_highlights', name: 'Monthly Highlights', url: '', isStatic: true },
+                { id: 'r_payslip', name: 'Payslip', url: '', isStatic: true },
+                { id: 'r_elibrary', name: 'Neerada e-Library', url: '', isStatic: true },
+                { id: 'r_store', name: 'Neerada Store', url: '', isStatic: true }
+            ]
         };
 
         // UI State
@@ -904,6 +923,21 @@
             chom_kg: 'Chommany - Kindergarten', chom_pri: 'Chommany - Primary',
             chom_sec: 'Chommany - Secondary', chom_eng: 'Chommany - English'
         };
+
+        const adminDriveLinkNames = [
+            { key: 'sib_kg', label: 'Sibounheuang - Kindergarten' },
+            { key: 'sib_pri', label: 'Sibounheuang - Primary' },
+            { key: 'sib_sec', label: 'Sibounheuang - Secondary' },
+            { key: 'sib_eng_kg', label: 'Sibounheuang English - Kindergarten' },
+            { key: 'sib_eng_pri', label: 'Sibounheuang English - Primary' },
+            { key: 'sib_eng_sec', label: 'Sibounheuang English - Secondary' },
+            { key: 'chom_kg', label: 'Chommany - Kindergarten' },
+            { key: 'chom_pri', label: 'Chommany - Primary' },
+            { key: 'chom_sec', label: 'Chommany - Secondary' },
+            { key: 'chom_eng_kg', label: 'Chommany English - Kindergarten' },
+            { key: 'chom_eng_pri', label: 'Chommany English - Primary' },
+            { key: 'chom_eng_sec', label: 'Chommany English - Secondary' }
+        ];
 
         const menuTableStyles = {
             monday: 'bg-yellow-50/70 border-yellow-200 text-yellow-900',
@@ -979,6 +1013,7 @@
 
             // Re-run countdown so it picks up target date instantly
             updateCountdown();
+            renderResourcesMenu();
         }
 
         // Setup real-time connection to Firebase
@@ -986,7 +1021,7 @@
             const loading = document.getElementById('firebaseLoading');
             let isFirstLoad = true;
             
-            // Listen to General Settings (Announcement, Menu, Links, Logo, Lock Status)
+            // Listen to General Settings
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -995,6 +1030,17 @@
                     if (data.isLocked !== undefined) state.isLocked = data.isLocked;
                     if (data.menu) state.menu = data.menu;
                     if (data.driveLinks) state.driveLinks = data.driveLinks;
+                    if (data.resources) {
+                        // Merge static ones to ensure no deletion, and include any dynamically added ones
+                        const updatedRes = [];
+                        state.resources.filter(r => r.isStatic).forEach(staticRes => {
+                            const found = data.resources.find(dr => dr.id === staticRes.id);
+                            if (found) updatedRes.push({ ...staticRes, url: found.url });
+                            else updatedRes.push(staticRes);
+                        });
+                        data.resources.filter(dr => !dr.isStatic).forEach(dynRes => updatedRes.push(dynRes));
+                        state.resources = updatedRes;
+                    }
                 }
                 renderHomeContent();
                 applyDynamicSettings();
@@ -1055,7 +1101,8 @@
                     menu: state.menu,
                     driveLinks: state.driveLinks,
                     logo: state.logo,
-                    isLocked: state.isLocked || false
+                    isLocked: state.isLocked || false,
+                    resources: state.resources
                 }, { merge: true });
             } catch (e) { console.error("Error saving settings", e); alert("Error saving data to database."); }
         }
@@ -1333,7 +1380,18 @@
             lucide.createIcons();
         }
 
-        // --- Admin Form Loading ---
+        // --- Navigation / Menus Dynamic Resources Rendering ---
+        function renderResourcesMenu() {
+            const container = document.getElementById('acc-nav');
+            container.innerHTML = '';
+            state.resources.forEach(r => {
+                const hrefStr = r.url && r.url.trim() !== '' ? (r.url.startsWith('http') ? r.url : 'https://' + r.url) : '#';
+                const opacityClass = r.url && r.url.trim() !== '' ? '' : 'opacity-50 pointer-events-none';
+                container.innerHTML += `<a href="${hrefStr}" target="_blank" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors ${opacityClass}">${r.name}</a>`;
+            });
+        }
+
+        // --- Admin Form Loading & Renders ---
         window.loadAdminForms = function() {
             document.getElementById('adminAnnouncement').value = state.announcement;
             
@@ -1358,6 +1416,55 @@
             
             window.renderAdminTeachers();
             window.renderDriveLinksForm();
+            window.renderAdminResourcesForm();
+        };
+
+        window.renderAdminResourcesForm = function() {
+            const container = document.getElementById('adminResourcesContainer');
+            container.innerHTML = '';
+            state.resources.forEach((r, index) => {
+                const isStaticHtml = r.isStatic 
+                    ? `<label class="font-semibold text-gray-500 text-xs mb-1.5 ml-1">${r.name}</label>`
+                    : `<div class="flex justify-between items-center mb-1.5"><input type="text" id="resName_${index}" value="${r.name}" class="font-semibold text-sm border border-gray-200 rounded px-2 py-1 outline-none focus:border-brand-orange w-2/3"><button onclick="deleteResourceLink(${index})" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+                
+                container.innerHTML += `
+                    <div class="flex flex-col bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        ${isStaticHtml}
+                        <input type="text" id="resUrl_${index}" value="${r.url || ''}" placeholder="https://..." class="border border-gray-200 rounded-lg p-2.5 text-sm bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all">
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        window.addResourceLink = function() {
+            state.resources.push({
+                id: 'r_' + Date.now(),
+                name: 'New Custom Link',
+                url: '',
+                isStatic: false
+            });
+            window.renderAdminResourcesForm();
+        };
+
+        window.deleteResourceLink = function(index) {
+            if(confirm('Delete this custom link?')) {
+                state.resources.splice(index, 1);
+                window.renderAdminResourcesForm();
+            }
+        };
+
+        window.saveResourceLinks = function() {
+            state.resources.forEach((r, index) => {
+                if(!r.isStatic) {
+                    const nameInput = document.getElementById(`resName_${index}`);
+                    if(nameInput) r.name = nameInput.value.trim();
+                }
+                const urlInput = document.getElementById(`resUrl_${index}`);
+                if(urlInput) r.url = urlInput.value.trim();
+            });
+            fbSaveSettings();
+            alert("Resources Links Saved!");
         };
 
         window.savePortalSettings = function() {
@@ -1621,15 +1728,17 @@
         window.renderDriveLinksForm = function() {
             const container = document.getElementById('adminLinksContainer');
             container.innerHTML = '';
-            for (const [key, name] of Object.entries(deptNames)) {
+            adminDriveLinkNames.forEach(item => {
                 container.innerHTML += `
-                    <div class="flex flex-col"><label class="font-semibold text-gray-500 text-xs mb-1.5 ml-1">${name}</label>
-                    <input type="text" id="link_${key}" value="${state.driveLinks[key] || ''}" placeholder="https://drive.google.com/..." class="border border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none transition-all"></div>`;
-            }
+                    <div class="flex flex-col"><label class="font-semibold text-gray-500 text-xs mb-1.5 ml-1">${item.label}</label>
+                    <input type="text" id="link_${item.key}" value="${state.driveLinks[item.key] || ''}" placeholder="https://drive.google.com/..." class="border border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none transition-all"></div>`;
+            });
         };
 
         window.saveDriveLinks = function() {
-            for (const key of Object.keys(deptNames)) state.driveLinks[key] = document.getElementById(`link_${key}`).value.trim();
+            adminDriveLinkNames.forEach(item => {
+                state.driveLinks[item.key] = document.getElementById(`link_${item.key}`).value.trim();
+            });
             fbSaveSettings();
             alert("Links Saved!");
         };
@@ -1690,7 +1799,7 @@
                                 ${t.driveLink ? `<div class="absolute top-3 right-3 bg-brand-blue/90 text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
                             </div>
                             <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
-                                <h3 class="font-aesthetic font-bold text-2xl text-gray-900 truncate tracking-tight">${t.name}</h3>
+                                <h3 class="font-aesthetic font-bold text-xl sm:text-2xl text-gray-900 tracking-tight break-words whitespace-normal leading-tight">${t.name}</h3>
                                 <div class="flex items-center justify-center gap-2 mt-1">
                                     <span class="font-heading font-bold text-brand-blue/90 text-sm tracking-wide px-3 py-1 bg-blue-50 border border-blue-100 rounded-full">${t.level||'-'}</span>
                                     <span class="font-heading font-bold text-brand-orange/90 text-sm tracking-wide px-3 py-1 bg-orange-50 border border-orange-100 rounded-full">${t.room||'-'}</span>
@@ -1699,15 +1808,51 @@
                         </a>`;
                 });
             }
-            lucide.createIcons();
-            const link = state.driveLinks[deptKey]; const btn = document.getElementById('deptDriveLink');
-            if (link && link.trim() !== '') {
-                btn.href = link.startsWith('http') ? link : 'https://'+link; btn.classList.remove('opacity-50', 'pointer-events-none');
-                document.getElementById('noDriveWarning').classList.add('hidden');
+            
+            // Build the upload box dynamically depending on if it's the English dept
+            let uploadHtml = '';
+            if (deptKey === 'sib_eng' || deptKey === 'chom_eng') {
+                const prefix = deptKey; 
+                uploadHtml = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mx-auto">
+                        <a href="${state.driveLinks[prefix+'_kg'] ? (state.driveLinks[prefix+'_kg'].startsWith('http') ? state.driveLinks[prefix+'_kg'] : 'https://'+state.driveLinks[prefix+'_kg']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-blue/10 rounded-2xl hover:bg-brand-blue/20 transition-colors ${state.driveLinks[prefix+'_kg'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-blue mb-2"></i>
+                            <span class="font-bold text-sm text-brand-blue uppercase tracking-widest">Kindergarten</span>
+                        </a>
+                        <a href="${state.driveLinks[prefix+'_pri'] ? (state.driveLinks[prefix+'_pri'].startsWith('http') ? state.driveLinks[prefix+'_pri'] : 'https://'+state.driveLinks[prefix+'_pri']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-green/10 rounded-2xl hover:bg-brand-green/20 transition-colors ${state.driveLinks[prefix+'_pri'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-green mb-2"></i>
+                            <span class="font-bold text-sm text-brand-green uppercase tracking-widest">Primary</span>
+                        </a>
+                        <a href="${state.driveLinks[prefix+'_sec'] ? (state.driveLinks[prefix+'_sec'].startsWith('http') ? state.driveLinks[prefix+'_sec'] : 'https://'+state.driveLinks[prefix+'_sec']) : '#'}" target="_blank" class="flex flex-col items-center justify-center p-6 bg-brand-orange/10 rounded-2xl hover:bg-brand-orange/20 transition-colors ${state.driveLinks[prefix+'_sec'] ? '' : 'opacity-50 pointer-events-none'}">
+                            <i data-lucide="folder-up" class="w-8 h-8 text-brand-orange mb-2"></i>
+                            <span class="font-bold text-sm text-brand-orange uppercase tracking-widest">Secondary</span>
+                        </a>
+                    </div>
+                `;
+                if(!state.driveLinks[prefix+'_kg'] && !state.driveLinks[prefix+'_pri'] && !state.driveLinks[prefix+'_sec']) {
+                    uploadHtml += `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Links not configured by Admin yet.</p>`;
+                }
             } else {
-                btn.href = "#"; btn.classList.add('opacity-50', 'pointer-events-none');
-                document.getElementById('noDriveWarning').classList.remove('hidden');
+                const link = state.driveLinks[deptKey];
+                const isActive = link && link.trim() !== '';
+                uploadHtml = `
+                    <a href="${isActive ? (link.startsWith('http') ? link : 'https://'+link) : '#'}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-brand-blue text-white px-10 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all ${isActive ? '' : 'opacity-50 pointer-events-none'}">
+                        Open Google Drive
+                    </a>
+                    ${!isActive ? `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50 inline-block px-5 py-2 rounded-lg border border-red-100">Link not configured by Admin yet.</p>` : ''}
+                `;
             }
+            
+            document.getElementById('deptUploadBox').innerHTML = `
+                <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-100 shadow-sm">
+                    <i data-lucide="cloud-upload" class="w-8 h-8 text-brand-blue"></i>
+                </div>
+                <h3 class="font-heading text-2xl font-bold text-gray-900 mb-4 tracking-tight">Submit Documents</h3>
+                <p class="text-gray-500 font-normal mb-8 max-w-lg mx-auto text-base">Upload your monthly reports and class documents securely to the department drive.</p>
+                ${uploadHtml}
+            `;
+
+            lucide.createIcons();
             window.switchView('department');
         };
 
