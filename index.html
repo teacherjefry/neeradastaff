@@ -2014,12 +2014,57 @@
                     groups[lvl].push(t);
                 });
 
-                // Sort groups (General Staff at the end, others alphabetical)
+                // --- CUSTOM SORTING LOGIC FOR DEPARTMENT GROUPS ---
+                const getSortWeight = (groupName) => {
+                    const gn = groupName.toLowerCase();
+                    
+                    // 1. Top Level Leadership
+                    if (gn.includes('vice principal')) return 10;
+                    if (gn.includes('academic head') || gn.includes('ວິຊາການ')) return 20;
+
+                    // 2. Kindergarten Hierarchy
+                    if (gn.includes('pre-k') || gn.includes('pre k')) return 100;
+                    if (gn.includes('k1') || gn.includes('k 1')) return 110;
+                    if (gn.includes('k2') || gn.includes('k 2')) return 120;
+                    if (gn.includes('k3') || gn.includes('k 3')) return 130;
+
+                    // 3. Primary Hierarchy
+                    if (gn.includes('p1') || gn.includes('p 1')) return 210;
+                    if (gn.includes('p2') || gn.includes('p 2')) return 220;
+                    if (gn.includes('p3') || gn.includes('p 3')) return 230;
+                    if (gn.includes('p4') || gn.includes('p 4')) return 240;
+                    if (gn.includes('p5') || gn.includes('p 5')) return 250;
+
+                    // 4. Secondary Hierarchy
+                    if (gn.includes('lower secondary')) return 300; // English Dept specific
+                    if (gn.includes('s1') || gn.includes('s 1') || gn.includes('m1') || gn.includes('m 1')) return 310;
+                    if (gn.includes('s2') || gn.includes('s 2') || gn.includes('m2') || gn.includes('m 2')) return 320;
+                    if (gn.includes('s3') || gn.includes('s 3') || gn.includes('m3') || gn.includes('m 3')) return 330;
+                    if (gn.includes('s4') || gn.includes('s 4') || gn.includes('m4') || gn.includes('m 4')) return 340;
+                    if (gn.includes('higher secondary')) return 345; // English Dept specific
+                    if (gn.includes('s5') || gn.includes('s 5') || gn.includes('m5') || gn.includes('m 5')) return 350;
+                    if (gn.includes('s6') || gn.includes('s 6') || gn.includes('m6') || gn.includes('m 6')) return 360;
+                    if (gn.includes('s7') || gn.includes('s 7') || gn.includes('m7') || gn.includes('m 7')) return 370;
+
+                    // 5. Catch-all for others (put before General Staff but after specific classes)
+                    if (gn !== 'general staff') return 900;
+                    
+                    // 6. Unassigned / General
+                    return 1000;
+                };
+
                 const groupKeys = Object.keys(groups).sort((a, b) => {
-                    if (a === 'General Staff') return 1;
-                    if (b === 'General Staff') return -1;
+                    const weightA = getSortWeight(a);
+                    const weightB = getSortWeight(b);
+                    
+                    // If they have different weights, sort by weight
+                    if (weightA !== weightB) {
+                        return weightA - weightB;
+                    }
+                    // If weights are the same (e.g., both are unknown classes = 900), sort alphabetically
                     return a.localeCompare(b);
                 });
+                // --- END CUSTOM SORTING LOGIC ---
 
                 let html = '';
                 groupKeys.forEach(g => {
