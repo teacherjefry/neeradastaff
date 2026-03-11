@@ -23,10 +23,10 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        // Inter for English, falls back to Phetsarath OT for Lao
+                        // Smart Font Fallback: English uses primary, Lao perfectly falls back to Phetsarath OT
                         sans: ['Inter', '"Phetsarath OT"', '"Noto Sans Lao"', 'sans-serif'],
-                        heading: ['Montserrat', 'sans-serif'],
-                        aesthetic: ['Playfair Display', 'serif'],
+                        heading: ['Montserrat', '"Phetsarath OT"', 'sans-serif'],
+                        aesthetic: ['Playfair Display', '"Phetsarath OT"', 'serif'],
                     },
                     colors: {
                         brand: {
@@ -191,11 +191,11 @@
             </div>
             
             <h2 class="font-heading text-3xl md:text-4xl font-bold uppercase tracking-widest text-brand-blue mb-1 text-center">Important Notice</h2>
-            <div class="font-bold text-xl md:text-2xl text-brand-blue/80 mb-2 text-center tracking-wide">ແຈ້ງການສຳຄັນ</div>
+            <div class="font-bold text-xl md:text-2xl text-brand-blue/80 mb-2 text-center tracking-wide font-sans">ແຈ້ງການສຳຄັນ</div>
             <div class="font-aesthetic italic text-xl text-gray-500 mb-8 text-center">Neerada School</div>
             
             <div class="w-full bg-gray-50/50 p-6 md:p-8 rounded-2xl border border-gray-100 mb-10 shadow-inner">
-                <p id="popupText" class="text-lg text-gray-700 font-medium whitespace-pre-line leading-relaxed text-center"></p>
+                <p id="popupText" class="text-lg text-gray-700 font-medium whitespace-pre-line leading-relaxed text-center font-sans"></p>
             </div>
             
             <button onclick="closeAnnouncement()" class="w-full md:w-auto px-12 py-4 bg-brand-blue text-white font-semibold text-lg rounded-full shadow-btn hover:shadow-lg hover:-translate-y-0.5 transition-all tracking-wide">
@@ -216,7 +216,7 @@
             </div>
             <p id="eventDateLabel" class="text-sm font-medium text-gray-500 mb-6 bg-gray-50 inline-block px-3 py-1 rounded-md border border-gray-100">Date: </p>
 
-            <input type="text" id="eventTitle" placeholder="Event Title..." class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 mb-4 transition-colors">
+            <input type="text" id="eventTitle" placeholder="Event Title..." class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 mb-4 transition-colors font-sans">
             
             <label class="flex items-center gap-3 mb-6 cursor-pointer group p-3.5 border border-gray-100 rounded-xl hover:bg-red-50/50 transition-colors">
                 <input type="checkbox" id="eventIsHoliday" class="w-5 h-5 text-red-500 rounded border-gray-300 cursor-pointer">
@@ -280,28 +280,28 @@
             <!-- Sibounheuang Accordion -->
             <div>
                 <button onclick="toggleAccordion('acc-sib')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-4"><i data-lucide="school" class="w-5 h-5 text-brand-blue opacity-80"></i> Sibounheuang (ສີບຸນເຮືອງ)</div>
+                    <div class="flex items-center gap-4 font-sans"><i data-lucide="school" class="w-5 h-5 text-brand-blue opacity-80"></i> Sibounheuang (ສີບຸນເຮືອງ)</div>
                     <i id="acc-sib-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
                 </button>
                 <div id="acc-sib" class="hidden pl-12 pr-4 py-2 space-y-1">
-                    <button onclick="loadDeptAndClose('sib_kg', 'Sibounheuang - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
-                    <button onclick="loadDeptAndClose('sib_pri', 'Sibounheuang - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Primary ປະຖົມ</button>
-                    <button onclick="loadDeptAndClose('sib_sec', 'Sibounheuang - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
-                    <button onclick="loadDeptAndClose('sib_eng', 'Sibounheuang - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                    <button onclick="loadDeptAndClose('sib_kg', 'Sibounheuang - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors font-sans">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('sib_pri', 'Sibounheuang - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors font-sans">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('sib_sec', 'Sibounheuang - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors font-sans">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('sib_eng', 'Sibounheuang - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-blue-50/50 hover:text-brand-blue rounded-lg transition-colors font-sans">English Dept. ອັງກິດ</button>
                 </div>
             </div>
 
             <!-- Chommany Accordion -->
             <div>
                 <button onclick="toggleAccordion('acc-chom')" class="w-full flex justify-between items-center font-medium text-gray-700 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-4"><i data-lucide="building-2" class="w-5 h-5 text-brand-green opacity-80"></i> Chommany (ຈອມມະນີ)</div>
+                    <div class="flex items-center gap-4 font-sans"><i data-lucide="building-2" class="w-5 h-5 text-brand-green opacity-80"></i> Chommany (ຈອມມະນີ)</div>
                     <i id="acc-chom-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
                 </button>
                 <div id="acc-chom" class="hidden pl-12 pr-4 py-2 space-y-1">
-                    <button onclick="loadDeptAndClose('chom_kg', 'Chommany - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Kindergarten ອະນຸບານ</button>
-                    <button onclick="loadDeptAndClose('chom_pri', 'Chommany - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Primary ປະຖົມ</button>
-                    <button onclick="loadDeptAndClose('chom_sec', 'Chommany - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">Secondary ມັດທະຍົມ</button>
-                    <button onclick="loadDeptAndClose('chom_eng', 'Chommany - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors">English Dept. ອັງກິດ</button>
+                    <button onclick="loadDeptAndClose('chom_kg', 'Chommany - Kindergarten')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors font-sans">Kindergarten ອະນຸບານ</button>
+                    <button onclick="loadDeptAndClose('chom_pri', 'Chommany - Primary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors font-sans">Primary ປະຖົມ</button>
+                    <button onclick="loadDeptAndClose('chom_sec', 'Chommany - Secondary')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors font-sans">Secondary ມັດທະຍົມ</button>
+                    <button onclick="loadDeptAndClose('chom_eng', 'Chommany - English Dept')" class="w-full text-left text-sm text-gray-600 p-3 hover:bg-green-50/50 hover:text-brand-green rounded-lg transition-colors font-sans">English Dept. ອັງກິດ</button>
                 </div>
             </div>
 
@@ -375,7 +375,7 @@
                         Staff Hub
                     </h1>
                     
-                    <p class="text-lg md:text-xl font-normal text-gray-100 max-w-2xl mx-auto drop-shadow bg-white/10 backdrop-blur-md px-8 py-5 rounded-3xl border border-white/20 leading-relaxed">
+                    <p class="text-lg md:text-xl font-normal text-gray-100 max-w-2xl mx-auto drop-shadow bg-white/10 backdrop-blur-md px-8 py-5 rounded-3xl border border-white/20 leading-relaxed font-sans">
                         Access resources, manage info, and stay updated.
                         <span class="block mt-2 text-base text-gray-300 font-medium tracking-wide">ເຂົ້າເຖິງຂໍ້ມູນ, ຊັບພະຍາກອນ ແລະ ຂ່າວສານໃໝ່ໆຂອງໂຮງຮຽນ.</span>
                     </p>
@@ -395,7 +395,7 @@
                             <i data-lucide="bell-ring" class="w-10 h-10 md:w-14 md:h-14 animate-pulse"></i>
                         </div>
                         
-                        <div class="text-center z-10 w-full flex flex-col items-center">
+                        <div class="text-center z-10 w-full flex flex-col items-center font-sans">
                             <h2 class="font-heading text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600 tracking-wide mb-1 uppercase">Important Notice Board</h2>
                             <div class="text-orange-500 font-bold text-lg md:text-xl mb-4 tracking-wide">ກະດານແຈ້ງການສຳຄັນ</div>
                             <div class="w-20 h-1.5 bg-yellow-400 rounded-full mb-6 mx-auto"></div>
@@ -418,12 +418,12 @@
                             <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-rose-200 to-pink-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
                             <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-gradient-to-tr from-amber-200 to-orange-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
                             
-                            <div class="relative z-10">
+                            <div class="relative z-10 font-sans">
                                 <div class="bg-gradient-to-tr from-rose-100 to-pink-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-200/50 shadow-md transform hover:rotate-12 transition-transform duration-500">
                                     <i data-lucide="calendar-clock" class="w-8 h-8 text-rose-600"></i>
                                 </div>
                                 
-                                <h2 class="font-sans text-xl md:text-2xl font-bold text-gray-900 mb-1 leading-snug">
+                                <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-1 leading-snug">
                                     ນັບຖອຍຫຼັງສຳລັບສົ່ງບົດສະຫຼຸບປະຈໍາເດືອນ
                                 </h2>
                                 <h3 class="font-heading text-lg md:text-xl font-extrabold text-gray-800 uppercase tracking-widest mb-4">
@@ -431,7 +431,7 @@
                                 </h3>
                                 <p class="text-gray-600 font-medium text-base mb-8 tracking-wide font-sans">
                                     ກຳນົດເວລາສົ່ງບົດສະຫຼຸບປະຈຳເດືອນ (Next Deadline):
-                                    <span class="block mt-2 text-sm md:text-base bg-white/80 text-rose-700 font-bold inline-block px-4 py-2 rounded-xl border border-rose-100 shadow-sm" id="targetDateDisplay">Loading...</span>
+                                    <span class="block mt-2 text-sm md:text-base bg-white/80 text-rose-700 font-bold inline-block px-4 py-2 rounded-xl border border-rose-100 shadow-sm font-sans" id="targetDateDisplay">Loading...</span>
                                 </p>
                                 
                                 <div class="flex justify-center gap-2 sm:gap-3 md:gap-5 w-full">
@@ -440,28 +440,28 @@
                                         <div class="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(225,29,72,0.25)] transform hover:-translate-y-1 transition-all duration-300">
                                             <span id="cd-days" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-rose-500 to-red-600 drop-shadow-sm">00</span>
                                         </div>
-                                        <span class="mt-3 sm:mt-4 font-bold text-rose-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Days <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ມື້</span></span>
+                                        <span class="mt-3 sm:mt-4 font-bold text-rose-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm font-sans">Days <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ມື້</span></span>
                                     </div>
                                     <!-- Hours -->
                                     <div class="flex flex-col items-center">
                                         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(37,99,235,0.25)] transform hover:-translate-y-1 transition-all duration-300">
                                             <span id="cd-hours" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-indigo-600 drop-shadow-sm">00</span>
                                         </div>
-                                        <span class="mt-3 sm:mt-4 font-bold text-blue-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Hrs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ຊົ່ວໂມງ</span></span>
+                                        <span class="mt-3 sm:mt-4 font-bold text-blue-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm font-sans">Hrs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ຊົ່ວໂມງ</span></span>
                                     </div>
                                     <!-- Minutes -->
                                     <div class="flex flex-col items-center">
                                         <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(16,185,129,0.25)] transform hover:-translate-y-1 transition-all duration-300">
                                             <span id="cd-mins" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-500 to-teal-600 drop-shadow-sm">00</span>
                                         </div>
-                                        <span class="mt-3 sm:mt-4 font-bold text-emerald-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Mins <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ນາທີ</span></span>
+                                        <span class="mt-3 sm:mt-4 font-bold text-emerald-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm font-sans">Mins <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ນາທີ</span></span>
                                     </div>
                                     <!-- Seconds -->
                                     <div class="flex flex-col items-center">
                                         <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(245,158,11,0.25)] transform hover:-translate-y-1 transition-all duration-300">
                                             <span id="cd-secs" class="font-heading text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-amber-500 to-orange-600 drop-shadow-sm">00</span>
                                         </div>
-                                        <span class="mt-3 sm:mt-4 font-bold text-amber-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm">Secs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ວິນາທີ</span></span>
+                                        <span class="mt-3 sm:mt-4 font-bold text-amber-600 uppercase tracking-widest text-[10px] sm:text-xs drop-shadow-sm font-sans">Secs <span class="block text-[8px] sm:text-[10px] font-medium mt-0.5 opacity-80">ວິນາທີ</span></span>
                                     </div>
                                 </div>
                             </div>
@@ -471,8 +471,8 @@
                         <div class="bg-gradient-to-br from-indigo-50/95 via-blue-50/95 to-cyan-100/90 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-elegant p-4 md:p-8 flex flex-col h-full relative group overflow-hidden">
                             
                             <!-- Calendar Top Title -->
-                            <div class="text-center mb-6 border-b border-indigo-200/60 pb-5">
-                                <h2 class="font-sans text-xl md:text-2xl font-bold text-indigo-900 mb-1">ປະຕິທິນກິດຈະກຳໂຮງຮຽນ</h2>
+                            <div class="text-center mb-6 border-b border-indigo-200/60 pb-5 font-sans">
+                                <h2 class="text-xl md:text-2xl font-bold text-indigo-900 mb-1">ປະຕິທິນກິດຈະກຳໂຮງຮຽນ</h2>
                                 <h3 class="font-heading text-sm md:text-base font-bold text-indigo-700/80 uppercase tracking-widest">Calendar of School Activities</h3>
                             </div>
 
@@ -502,17 +502,17 @@
                             </div>
                             
                             <!-- Calendar Days Grid -->
-                            <div id="calGrid" class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-6">
+                            <div id="calGrid" class="grid grid-cols-7 gap-1 md:gap-2 text-center mb-6 font-sans">
                                 <!-- Days populated by JS -->
                             </div>
 
                             <!-- Event Summary List -->
                             <div class="flex-grow bg-white/60 rounded-2xl p-4 border border-white/80 shadow-sm overflow-hidden flex flex-col">
                                 <div class="flex justify-between items-center mb-3 sticky top-0 bg-white/80 backdrop-blur-md p-2 rounded-xl">
-                                    <h4 class="text-sm font-bold text-indigo-900 tracking-wide uppercase">Monthly Events</h4>
+                                    <h4 class="text-sm font-bold text-indigo-900 tracking-wide uppercase font-sans">Monthly Events</h4>
                                     <span class="text-[10px] text-gray-600 font-medium px-2 py-0.5 rounded-md"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-emerald-500 font-bold ml-1">•</span> Event</span>
                                 </div>
-                                <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar">
+                                <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar font-sans">
                                     <!-- Events populated by JS -->
                                 </div>
                             </div>
@@ -521,7 +521,7 @@
                 </div>
 
                 <!-- 3-Column Weekly Menu Table -->
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-elegant p-6 md:p-10 flex flex-col overflow-hidden">
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-elegant p-6 md:p-10 flex flex-col overflow-hidden font-sans">
                     <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 text-center md:text-left">
                         <div class="flex flex-col md:flex-row items-center gap-5">
                             <div class="bg-gradient-to-tr from-green-400 to-emerald-500 text-white p-4 rounded-2xl shadow-lg">
@@ -536,12 +536,12 @@
                         <!-- Aesthetic Date Range Badge -->
                         <div class="inline-flex items-center gap-2.5 bg-white/60 backdrop-blur-md border border-green-200/60 text-brand-green px-5 py-3 rounded-full shadow-sm">
                             <i data-lucide="calendar-days" class="w-5 h-5"></i>
-                            <span id="weeklyMenuDateRangeText" class="font-semibold text-sm tracking-wide">Loading dates...</span>
+                            <span id="weeklyMenuDateRangeText" class="font-semibold text-sm tracking-wide font-sans">Loading dates...</span>
                         </div>
                     </div>
 
                     <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm bg-white">
-                        <table class="w-full text-center border-collapse min-w-[600px]">
+                        <table class="w-full text-center border-collapse min-w-[600px] font-sans">
                             <thead>
                                 <tr class="bg-gray-50/80 border-b border-gray-200">
                                     <th class="py-5 px-6 font-heading font-bold text-gray-700 uppercase tracking-wider text-sm w-1/4">Date / ມື້</th>
@@ -560,15 +560,15 @@
         </section>
 
         <!-- VIEW: DEPARTMENT -->
-        <section id="view-department" class="view-section min-h-screen relative overflow-hidden transition-colors duration-1000" style="background-color: transparent;">
+        <section id="view-department" class="view-section min-h-screen relative overflow-hidden transition-colors duration-1000">
             <!-- ARTISTIC AESTHETIC BACKGROUND FOR DEPARTMENTS (Dynamically Colored via JS) -->
-            <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+            <div id="deptBgContainer" class="absolute inset-0 pointer-events-none overflow-hidden -z-10 bg-transparent transition-colors duration-1000">
                 <div id="deptOrb1" class="absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000" style="animation-duration: 8s;"></div>
                 <div id="deptOrb2" class="absolute bottom-0 right-1/4 w-[40rem] h-[40rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000" style="animation-duration: 10s;"></div>
                 <div id="deptOrb3" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] rounded-full blur-[150px] mix-blend-multiply opacity-40 transition-colors duration-1000"></div>
             </div>
 
-            <div class="max-w-7xl mx-auto relative z-10 px-4 py-16 flex flex-col items-center">
+            <div class="max-w-7xl mx-auto relative z-10 px-4 py-16 flex flex-col items-center font-sans">
                 <div class="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-gray-900/10 pb-6 gap-4 text-center w-full">
                     <div class="w-full text-center">
                         <span class="text-gray-600/80 font-bold tracking-widest uppercase text-sm mb-2 block font-heading">Department Roster</span>
@@ -589,7 +589,7 @@
         </section>
 
         <!-- VIEW: ADMIN DASHBOARD -->
-        <section id="view-admin" class="view-section py-16 px-4 max-w-7xl mx-auto hidden">
+        <section id="view-admin" class="view-section py-16 px-4 max-w-7xl mx-auto hidden font-sans">
             <div class="mb-12 border-b border-gray-300 pb-8 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-center md:text-left">
                     <span class="text-brand-green font-semibold tracking-widest uppercase text-xs mb-2 block">Management</span>
@@ -643,7 +643,7 @@
                             <h2 class="font-heading text-lg font-bold text-gray-900">Global Announcement</h2>
                         </div>
                         <p class="text-xs text-gray-500 mb-4">This shows as a full-screen popup and large board when users open the portal.</p>
-                        <textarea id="adminAnnouncement" rows="3" class="w-full border border-gray-200 rounded-xl p-4 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none mb-4 text-gray-700 bg-gray-50 transition-colors" placeholder="Type announcement here. Leave blank to disable popup."></textarea>
+                        <textarea id="adminAnnouncement" rows="3" class="w-full border border-gray-200 rounded-xl p-4 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none mb-4 text-gray-700 bg-gray-50 transition-colors font-sans" placeholder="Type announcement here. Leave blank to disable popup."></textarea>
                         <button onclick="saveAnnouncement()" class="w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
                             Save Announcement
                         </button>
@@ -659,42 +659,42 @@
                         <div class="space-y-6">
                             <!-- Monday -->
                             <div class="bg-yellow-50 p-4 rounded-2xl border border-yellow-100">
-                                <h3 class="font-bold text-yellow-800 mb-3 text-sm uppercase tracking-wide">Monday / ຈັນ</h3>
+                                <h3 class="font-bold text-yellow-800 mb-3 text-sm uppercase tracking-wide font-sans">Monday / ຈັນ</h3>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <textarea id="menu_monday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white"></textarea>
-                                    <textarea id="menu_monday_eng" rows="2" placeholder="English Menu..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white"></textarea>
+                                    <textarea id="menu_monday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white font-sans"></textarea>
+                                    <textarea id="menu_monday_eng" rows="2" placeholder="English Menu..." class="w-full border border-yellow-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 bg-white font-sans"></textarea>
                                 </div>
                             </div>
                             <!-- Tuesday -->
                             <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
-                                <h3 class="font-bold text-pink-800 mb-3 text-sm uppercase tracking-wide">Tuesday / ອັງຄານ</h3>
+                                <h3 class="font-bold text-pink-800 mb-3 text-sm uppercase tracking-wide font-sans">Tuesday / ອັງຄານ</h3>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <textarea id="menu_tuesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"></textarea>
-                                    <textarea id="menu_tuesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white"></textarea>
+                                    <textarea id="menu_tuesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white font-sans"></textarea>
+                                    <textarea id="menu_tuesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-pink-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-pink-400 bg-white font-sans"></textarea>
                                 </div>
                             </div>
                             <!-- Wednesday -->
                             <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
-                                <h3 class="font-bold text-green-800 mb-3 text-sm uppercase tracking-wide">Wednesday / ພຸດ</h3>
+                                <h3 class="font-bold text-green-800 mb-3 text-sm uppercase tracking-wide font-sans">Wednesday / ພຸດ</h3>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <textarea id="menu_wednesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white"></textarea>
-                                    <textarea id="menu_wednesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white"></textarea>
+                                    <textarea id="menu_wednesday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white font-sans"></textarea>
+                                    <textarea id="menu_wednesday_eng" rows="2" placeholder="English Menu..." class="w-full border border-green-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-400 bg-white font-sans"></textarea>
                                 </div>
                             </div>
                             <!-- Thursday -->
                             <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100">
-                                <h3 class="font-bold text-orange-800 mb-3 text-sm uppercase tracking-wide">Thursday / ພະຫັດ</h3>
+                                <h3 class="font-bold text-orange-800 mb-3 text-sm uppercase tracking-wide font-sans">Thursday / ພະຫັດ</h3>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <textarea id="menu_thursday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white"></textarea>
-                                    <textarea id="menu_thursday_eng" rows="2" placeholder="English Menu..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white"></textarea>
+                                    <textarea id="menu_thursday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white font-sans"></textarea>
+                                    <textarea id="menu_thursday_eng" rows="2" placeholder="English Menu..." class="w-full border border-orange-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white font-sans"></textarea>
                                 </div>
                             </div>
                             <!-- Friday -->
                             <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-                                <h3 class="font-bold text-blue-800 mb-3 text-sm uppercase tracking-wide">Friday / ສຸກ</h3>
+                                <h3 class="font-bold text-blue-800 mb-3 text-sm uppercase tracking-wide font-sans">Friday / ສຸກ</h3>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <textarea id="menu_friday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white"></textarea>
-                                    <textarea id="menu_friday_eng" rows="2" placeholder="English Menu..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white"></textarea>
+                                    <textarea id="menu_friday_lao" rows="2" placeholder="ເມນູພາສາລາວ..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white font-sans"></textarea>
+                                    <textarea id="menu_friday_eng" rows="2" placeholder="English Menu..." class="w-full border border-blue-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white font-sans"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -726,12 +726,12 @@
                                 <option value="chom_eng">Chommany - English</option>
                             </select>
                             
-                            <input type="text" id="tLaoName" placeholder="Lao Name (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
-                            <input type="text" id="tName" placeholder="English Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+                            <input type="text" id="tLaoName" placeholder="Lao Name (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700 font-sans">
+                            <input type="text" id="tName" placeholder="English Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700 font-sans">
                             
                             <div class="flex gap-4">
-                                <input type="text" id="tLevel" placeholder="Level/Group (e.g. P1 Teachers)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
-                                <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
+                                <input type="text" id="tLevel" placeholder="Level/Group (e.g. P1 Teachers)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 font-sans">
+                                <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 font-sans">
                             </div>
                             
                             <input type="url" id="tDriveLink" placeholder="Personal Google Drive Folder URL (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
@@ -805,13 +805,13 @@
                                     <p class="text-[10px] text-gray-400 font-medium">Drag grip to reorder</p>
                                 </div>
                             </div>
-                            <select id="filterDept" onchange="renderAdminTeachers()" class="border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-none focus:border-brand-blue bg-gray-50 text-gray-700 cursor-pointer">
+                            <select id="filterDept" onchange="renderAdminTeachers()" class="border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-none focus:border-brand-blue bg-gray-50 text-gray-700 cursor-pointer font-sans">
                                 <option value="all">All Depts</option>
                                 <option value="sib_kg">Sib - KG</option><option value="sib_pri">Sib - Pri</option><option value="sib_sec">Sib - Sec</option><option value="sib_eng">Sib - Eng</option>
                                 <option value="chom_kg">Chom - KG</option><option value="chom_pri">Chom - Pri</option><option value="chom_sec">Chom - Sec</option><option value="chom_eng">Chom - Eng</option>
                             </select>
                         </div>
-                        <div class="overflow-y-auto pr-2 space-y-2 flex-grow" id="adminTeacherList"></div>
+                        <div class="overflow-y-auto pr-2 space-y-2 flex-grow font-sans" id="adminTeacherList"></div>
                     </div>
 
                     <!-- Drive Links Manager (Department Wide) -->
@@ -821,7 +821,7 @@
                             <h2 class="font-heading text-lg font-bold text-gray-900">Department Drive Links</h2>
                         </div>
                         <p class="text-xs text-gray-500 mb-4">Set the master Google Drive folder links for each department.</p>
-                        <div class="grid grid-cols-1 gap-4 overflow-y-auto max-h-[400px] pr-2 no-scrollbar" id="adminLinksContainer"></div>
+                        <div class="grid grid-cols-1 gap-4 overflow-y-auto max-h-[400px] pr-2 no-scrollbar font-sans" id="adminLinksContainer"></div>
                         <button onclick="saveDriveLinks()" class="mt-6 w-full bg-gray-900 text-white font-semibold text-sm py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all">
                             Save Drive Links
                         </button>
@@ -834,7 +834,7 @@
                             <h2 class="font-heading text-lg font-bold text-gray-900">Resources Menu Links</h2>
                         </div>
                         <p class="text-xs text-gray-500 mb-4">Manage the links that appear in the 'Resources' tab on the side menu.</p>
-                        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar" id="adminResourcesContainer">
+                        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar font-sans" id="adminResourcesContainer">
                             <!-- Populated via JS -->
                         </div>
                         
@@ -906,7 +906,7 @@
 
         // --- Data & State ---
         let state = {
-            isLoggedIn: false,
+            isLoggedIn: localStorage.getItem('isAdminAuthorized') === 'true',
             isLocked: false,
             announcement: '',
             logo: '', 
@@ -1136,6 +1136,8 @@
                         setTimeout(() => loading.classList.add('hidden'), 500);
                     }
                     
+                    updateAuthUI();
+
                     // Restore state exactly where the user left off
                     if (currentActiveView === 'department' && currentActiveDeptKey) {
                         window.showDepartment(currentActiveDeptKey, currentActiveDeptTitle);
@@ -1197,10 +1199,8 @@
                 // Sort by internal order
                 state.teachers.sort((a,b) => (a.order || 0) - (b.order || 0));
                 
-                if (document.getElementById('view-department').classList.contains('active')) {
-                    const currentTitle = document.getElementById('deptTitle').innerText;
-                    const currentKey = Object.keys(deptNames).find(key => deptNames[key] === currentTitle || deptNames[key].includes(currentTitle.split(' ')[0]));
-                    if(currentKey) window.showDepartment(currentKey, currentTitle);
+                if (document.getElementById('view-department').classList.contains('active') && currentActiveDeptKey) {
+                    window.showDepartment(currentActiveDeptKey, currentActiveDeptTitle);
                 }
                 window.renderAdminTeachers();
                 loadedTeachers = true;
@@ -1554,7 +1554,7 @@
             state.resources.forEach(r => {
                 const hrefStr = r.url && r.url.trim() !== '' ? (r.url.startsWith('http') ? r.url : 'https://' + r.url) : '#';
                 const opacityClass = r.url && r.url.trim() !== '' ? '' : 'opacity-50 pointer-events-none';
-                container.innerHTML += `<a href="${hrefStr}" target="_blank" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors ${opacityClass}">${r.name}</a>`;
+                container.innerHTML += `<a href="${hrefStr}" target="_blank" class="block text-sm text-gray-600 p-3 hover:bg-orange-50/50 hover:text-brand-orange rounded-lg transition-colors font-sans ${opacityClass}">${r.name}</a>`;
             });
         }
 
@@ -1882,7 +1882,7 @@
                             <div class="cursor-grab text-gray-300 hover:text-gray-500 py-2"><i data-lucide="grip-vertical" class="w-5 h-5"></i></div>
                             <img src="${pic}" class="w-10 h-14 rounded bg-gray-50 object-contain border border-gray-100 pointer-events-none">
                             <div class="pointer-events-none overflow-hidden pr-2">
-                                <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate">${t.name} ${t.laoName ? `(${t.laoName})` : ''}</h4>
+                                <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate font-sans">${t.name} ${t.laoName ? `(${t.laoName})` : ''}</h4>
                                 <div class="text-[10px] font-medium text-gray-500 uppercase truncate">${deptNames[t.department]} | Rm: ${t.room||'-'}</div>
                                 ${t.driveLink ? `<div class="text-[10px] text-blue-500 mt-0.5"><i data-lucide="link" class="w-3 h-3 inline"></i> Link Added</div>` : ''}
                             </div>
@@ -1983,11 +1983,23 @@
             document.getElementById('mainBody').className = "antialiased min-h-screen flex flex-col transition-colors duration-1000";
             
             const viewDeptContainer = document.getElementById('view-department');
-            viewDeptContainer.className = `view-section active min-h-screen relative overflow-hidden transition-colors duration-1000 ${theme.bg}`;
+            if (viewDeptContainer) {
+                viewDeptContainer.className = `view-section active min-h-screen relative overflow-hidden transition-colors duration-1000`;
+            }
             
-            document.getElementById('deptOrb1').className = `absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-br ${theme.orb1}`;
-            document.getElementById('deptOrb2').className = `absolute bottom-0 right-1/4 w-[40rem] h-[40rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-tl ${theme.orb2}`;
-            document.getElementById('deptOrb3').className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] rounded-full blur-[150px] mix-blend-multiply opacity-40 transition-colors duration-1000 bg-gradient-to-tr ${theme.orb1}`;
+            const deptBgContainer = document.getElementById('deptBgContainer');
+            if (deptBgContainer) {
+                deptBgContainer.className = `absolute inset-0 pointer-events-none overflow-hidden -z-10 transition-colors duration-1000 ${theme.bg}`;
+            }
+            
+            const orb1 = document.getElementById('deptOrb1');
+            if (orb1) orb1.className = `absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-br ${theme.orb1}`;
+            
+            const orb2 = document.getElementById('deptOrb2');
+            if (orb2) orb2.className = `absolute bottom-0 right-1/4 w-[40rem] h-[40rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-tl ${theme.orb2}`;
+            
+            const orb3 = document.getElementById('deptOrb3');
+            if (orb3) orb3.className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] rounded-full blur-[150px] mix-blend-multiply opacity-40 transition-colors duration-1000 bg-gradient-to-tr ${theme.orb1}`;
             
             const dt = state.teachers.filter(t => t.department === deptKey);
             
@@ -2018,7 +2030,7 @@
                                 <div class="w-full border-t border-gray-300/40"></div>
                             </div>
                             <div class="relative flex justify-center">
-                                <span class="${theme.divBg} shadow-md px-8 py-3 rounded-2xl border border-white/40 font-heading font-black uppercase tracking-[0.2em] text-lg md:text-xl drop-shadow-sm">${g}</span>
+                                <span class="${theme.divBg} font-sans shadow-md px-8 py-3 rounded-2xl border border-white/40 font-bold uppercase tracking-widest text-lg md:text-xl drop-shadow-sm">${g}</span>
                             </div>
                         </div>
                         <div class="flex flex-wrap justify-center gap-8 items-stretch w-full">
@@ -2064,23 +2076,23 @@
                     <div class="flex flex-wrap justify-center gap-4 md:gap-6 w-full mt-6">
                         <a href="${state.driveLinks[prefix+'_kg'] ? (state.driveLinks[prefix+'_kg'].startsWith('http') ? state.driveLinks[prefix+'_kg'] : 'https://'+state.driveLinks[prefix+'_kg']) : '#'}" target="_blank" class="flex flex-col items-center justify-center gap-2 px-8 py-5 bg-gradient-to-br ${theme.btnGrad} text-white rounded-[2rem] hover:-translate-y-1 transition-all ${theme.btnShadow} ${state.driveLinks[prefix+'_kg'] ? '' : 'opacity-50 pointer-events-none'}">
                             <i data-lucide="folder-kanban" class="w-8 h-8 mb-1"></i>
-                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm">Kindergarten</span>
+                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm font-sans">Kindergarten</span>
                             <span class="text-xs text-white/80 font-medium font-sans">ອະນຸບານ</span>
                         </a>
                         <a href="${state.driveLinks[prefix+'_pri'] ? (state.driveLinks[prefix+'_pri'].startsWith('http') ? state.driveLinks[prefix+'_pri'] : 'https://'+state.driveLinks[prefix+'_pri']) : '#'}" target="_blank" class="flex flex-col items-center justify-center gap-2 px-8 py-5 bg-gradient-to-br ${theme.btnGrad} text-white rounded-[2rem] hover:-translate-y-1 transition-all ${theme.btnShadow} ${state.driveLinks[prefix+'_pri'] ? '' : 'opacity-50 pointer-events-none'}">
                             <i data-lucide="folder-kanban" class="w-8 h-8 mb-1"></i>
-                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm">Primary</span>
+                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm font-sans">Primary</span>
                             <span class="text-xs text-white/80 font-medium font-sans">ປະຖົມ</span>
                         </a>
                         <a href="${state.driveLinks[prefix+'_sec'] ? (state.driveLinks[prefix+'_sec'].startsWith('http') ? state.driveLinks[prefix+'_sec'] : 'https://'+state.driveLinks[prefix+'_sec']) : '#'}" target="_blank" class="flex flex-col items-center justify-center gap-2 px-8 py-5 bg-gradient-to-br ${theme.btnGrad} text-white rounded-[2rem] hover:-translate-y-1 transition-all ${theme.btnShadow} ${state.driveLinks[prefix+'_sec'] ? '' : 'opacity-50 pointer-events-none'}">
                             <i data-lucide="folder-kanban" class="w-8 h-8 mb-1"></i>
-                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm">Secondary</span>
+                            <span class="font-bold text-sm uppercase tracking-widest leading-none drop-shadow-sm font-sans">Secondary</span>
                             <span class="text-xs text-white/80 font-medium font-sans">ມັດທະຍົມ</span>
                         </a>
                     </div>
                 `;
                 if(!state.driveLinks[prefix+'_kg'] && !state.driveLinks[prefix+'_pri'] && !state.driveLinks[prefix+'_sec']) {
-                    uploadHtml += `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50/80 backdrop-blur-sm inline-block px-5 py-2.5 rounded-xl border border-red-200">Drive links not configured</p>`;
+                    uploadHtml += `<p class="text-red-500 font-medium text-sm mt-6 bg-red-50/80 backdrop-blur-sm inline-block px-5 py-2.5 rounded-xl border border-red-200 font-sans">Drive links not configured</p>`;
                 }
             } else {
                 const link = state.driveLinks[deptKey];
@@ -2090,11 +2102,11 @@
                         <a href="${isActive ? (link.startsWith('http') ? link : 'https://'+link) : '#'}" target="_blank" class="inline-flex items-center justify-center gap-4 bg-gradient-to-br ${theme.btnGrad} text-white px-10 py-5 rounded-[2rem] shadow-lg hover:-translate-y-1 transition-all ${theme.btnShadow} ${isActive ? '' : 'opacity-50 pointer-events-none'}">
                             <i data-lucide="folder-kanban" class="w-7 h-7 drop-shadow-sm"></i> 
                             <div class="flex flex-col text-left">
-                                <span class="font-bold text-base uppercase tracking-widest mb-1 drop-shadow-sm">Submit Monthly Reports</span>
+                                <span class="font-bold text-base uppercase tracking-widest mb-1 drop-shadow-sm font-sans">Submit Monthly Reports</span>
                                 <span class="text-xs text-white/80 font-medium leading-none font-sans drop-shadow-sm">ສົ່ງບົດລາຍງານ ແລະ ເອກະສານ</span>
                             </div>
                         </a>
-                        ${!isActive ? `<div class="w-full mt-4"><p class="text-red-500 font-medium text-sm bg-red-50/80 backdrop-blur-sm inline-block px-5 py-2.5 rounded-xl border border-red-200">Drive link not configured</p></div>` : ''}
+                        ${!isActive ? `<div class="w-full mt-4"><p class="text-red-500 font-medium text-sm bg-red-50/80 backdrop-blur-sm inline-block px-5 py-2.5 rounded-xl border border-red-200 font-sans">Drive link not configured</p></div>` : ''}
                     </div>
                 `;
             }
@@ -2104,7 +2116,13 @@
 
             lucide.createIcons();
             
-            window.switchView('department');
+            // Hide other views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Remove hidden
+            if(viewDeptContainer) {
+                viewDeptContainer.classList.add('active');
+            }
+            window.scrollTo(0, 0);
         };
 
         // --- Secret System Lock Logic ---
@@ -2156,6 +2174,7 @@
         window.checkLogin = function() {
             if (document.getElementById('adminPassword').value === '0000') {
                 state.isLoggedIn = true; 
+                localStorage.setItem('isAdminAuthorized', 'true');
                 window.closeLoginModal();
                 updateAuthUI();
                 window.renderCalendar();
@@ -2172,6 +2191,7 @@
         window.logoutAdminFromMenu = function() { window.toggleSideMenu(); setTimeout(window.logoutAdmin, 300); };
         window.logoutAdmin = function() {
             state.isLoggedIn = false;
+            localStorage.removeItem('isAdminAuthorized');
             updateAuthUI();
             window.renderCalendar(); 
             window.switchView('home');
