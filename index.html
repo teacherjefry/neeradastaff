@@ -507,9 +507,9 @@
 
                             <!-- Event Summary List -->
                             <div class="flex-grow bg-white/60 rounded-2xl p-4 border border-white/80 shadow-sm overflow-hidden flex flex-col">
-                                <div class="flex justify-between items-center mb-3 sticky top-0">
+                                <div class="flex justify-between items-center mb-3 sticky top-0 bg-white/80 backdrop-blur-md p-2 rounded-xl">
                                     <h4 class="text-sm font-bold text-indigo-900 tracking-wide uppercase">Monthly Events</h4>
-                                    <span class="text-[10px] text-gray-500 font-medium bg-white/80 px-2 py-0.5 rounded-md border border-white shadow-sm"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-brand-blue font-bold ml-1">•</span> Event</span>
+                                    <span class="text-[10px] text-gray-600 font-medium px-2 py-0.5 rounded-md"><span class="text-red-500 font-bold">•</span> Holiday <span class="text-emerald-500 font-bold ml-1">•</span> Event</span>
                                 </div>
                                 <div id="calEventList" class="space-y-2 overflow-y-auto pr-2 flex-grow max-h-[160px] no-scrollbar">
                                     <!-- Events populated by JS -->
@@ -559,7 +559,7 @@
         </section>
 
         <!-- VIEW: DEPARTMENT -->
-        <section id="view-department" class="view-section min-h-screen relative overflow-hidden transition-colors duration-1000" style="background-color: transparent;" id="deptBgContainer">
+        <section id="view-department" class="view-section min-h-screen relative overflow-hidden transition-colors duration-1000" style="background-color: transparent;">
             <!-- ARTISTIC AESTHETIC BACKGROUND FOR DEPARTMENTS (Dynamically Colored via JS) -->
             <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
                 <div id="deptOrb1" class="absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000" style="animation-duration: 8s;"></div>
@@ -1378,7 +1378,7 @@
                 const hasRegular = dayEvents.some(e => !e.isHoliday);
 
                 let dotsHtml = '';
-                if (hasRegular && !hasHoliday) dotsHtml += `<div class="w-1.5 h-1.5 rounded-full bg-brand-blue shadow-sm mb-1"></div>`;
+                if (hasRegular && !hasHoliday) dotsHtml += `<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm mb-1"></div>`;
                 if (hasRegular && hasHoliday) dotsHtml += `<div class="w-1.5 h-1.5 rounded-full bg-white shadow-sm mb-1"></div>`;
 
                 let bgClass = '';
@@ -1387,6 +1387,9 @@
                 if (hasHoliday) {
                     bgClass = 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md transform scale-105 z-10 border border-red-400';
                     textClass = 'text-xl md:text-2xl font-black drop-shadow-sm';
+                } else if (hasRegular) {
+                    // School event
+                    bgClass = 'bg-emerald-100/90 text-emerald-800 shadow-sm border border-emerald-300';
                 } else {
                     if (isToday) {
                         bgClass = 'bg-gradient-to-tr from-brand-blue to-indigo-500 text-white shadow-md border border-brand-blue/50';
@@ -1415,25 +1418,63 @@
                 return eMonth === displayMonth && eYear === displayYear;
             }).sort((a,b) => a.date.localeCompare(b.date));
 
+            // Group events with same title on consecutive/same days
+            const groupedEvents = [];
+            let currentGroup = null;
+
+            monthEvents.forEach((event, index) => {
+                if (!currentGroup) {
+                    currentGroup = { title: event.title, isHoliday: event.isHoliday, startDate: event.date, endDate: event.date, id: event.id };
+                } else if (currentGroup.title === event.title && currentGroup.isHoliday === event.isHoliday) {
+                    // Check if consecutive
+                    const d1 = new Date(currentGroup.endDate + "T00:00:00");
+                    const d2 = new Date(event.date + "T00:00:00");
+                    const diffTime = Math.abs(d2 - d1);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays <= 1) {
+                        currentGroup.endDate = event.date; // Extend end date
+                        currentGroup.id += ',' + event.id; // combine ids for deletion if needed
+                    } else {
+                        groupedEvents.push(currentGroup);
+                        currentGroup = { title: event.title, isHoliday: event.isHoliday, startDate: event.date, endDate: event.date, id: event.id };
+                    }
+                } else {
+                    groupedEvents.push(currentGroup);
+                    currentGroup = { title: event.title, isHoliday: event.isHoliday, startDate: event.date, endDate: event.date, id: event.id };
+                }
+            });
+            if (currentGroup) groupedEvents.push(currentGroup);
+
             list.innerHTML = '';
-            if (monthEvents.length === 0) {
+            if (groupedEvents.length === 0) {
                 list.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">No events scheduled.</p>`;
             } else {
-                monthEvents.forEach(e => {
-                    const dayNum = parseInt(e.date.split('-')[2]);
-                    const isHol = e.isHoliday;
-                    const styling = isHol ? 'bg-red-50 border-red-100 text-red-700' : 'bg-white border-gray-100 text-brand-blue';
-                    const icon = isHol ? 'calendar-off' : 'calendar-days';
-                    const titleColor = isHol ? 'text-red-800' : 'text-gray-800';
+                groupedEvents.forEach(g => {
+                    const startDayNum = parseInt(g.startDate.split('-')[2]);
+                    const endDayNum = parseInt(g.endDate.split('-')[2]);
+                    const dateDisplay = startDayNum === endDayNum ? startDayNum : `${startDayNum}-${endDayNum}`;
+                    
+                    const isHol = g.isHoliday;
+                    // Changed regular event to green
+                    const styling = isHol ? 'bg-red-50 border-red-100 text-red-700' : 'bg-emerald-50 border-emerald-100 text-emerald-800';
+                    const icon = isHol ? 'calendar-off' : 'calendar-check-2';
+                    const titleColor = isHol ? 'text-red-800' : 'text-emerald-900';
+                    const lineColor = isHol ? 'bg-red-200' : 'bg-emerald-200';
 
-                    let delBtn = state.isLoggedIn ? `<button onclick="deleteEvent('${e.id}')" class="ml-auto text-gray-400 hover:text-red-500 p-1 rounded hover:bg-white transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
+                    let delBtn = '';
+                    if (state.isLoggedIn) {
+                        // Allow deleting grouped events by taking first ID if grouped
+                        const primaryId = g.id.split(',')[0];
+                        delBtn = `<button onclick="deleteEvent('${primaryId}')" class="ml-auto text-gray-400 hover:text-red-500 p-1 rounded hover:bg-white transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                    }
 
                     list.innerHTML += `
                         <div class="flex items-center gap-3 p-3 rounded-xl border ${styling} shadow-sm group">
-                            <div class="font-bold w-6 text-center shrink-0 text-lg opacity-80">${dayNum}</div>
-                            <div class="h-6 w-px ${isHol ? 'bg-red-200' : 'bg-gray-200'}"></div>
-                            <i data-lucide="${icon}" class="w-5 h-5 opacity-70"></i>
-                            <span class="font-semibold text-sm ${titleColor} truncate">${e.title}</span>
+                            <div class="font-bold w-12 text-center shrink-0 text-base opacity-80">${dateDisplay}</div>
+                            <div class="h-6 w-px ${lineColor}"></div>
+                            <i data-lucide="${icon}" class="w-5 h-5 opacity-70 shrink-0"></i>
+                            <span class="font-semibold text-sm ${titleColor} truncate">${g.title}</span>
                             ${delBtn}
                         </div>
                     `;
@@ -1925,8 +1966,8 @@
             const theme = deptBackgrounds[deptKey] || deptBackgrounds['sib_kg'];
             document.getElementById('mainBody').className = "antialiased min-h-screen flex flex-col transition-colors duration-1000";
             
-            const deptBgContainer = document.getElementById('deptBgContainer');
-            deptBgContainer.className = `view-section active min-h-screen relative overflow-hidden transition-colors duration-1000 ${theme.bg}`;
+            const viewDeptContainer = document.getElementById('view-department');
+            viewDeptContainer.className = `view-section min-h-screen relative overflow-hidden transition-colors duration-1000 ${theme.bg}`;
             
             document.getElementById('deptOrb1').className = `absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-br ${theme.orb1}`;
             document.getElementById('deptOrb2').className = `absolute bottom-0 right-1/4 w-[40rem] h-[40rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-tl ${theme.orb2}`;
@@ -2041,10 +2082,7 @@
 
             lucide.createIcons();
             
-            // Hide other views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            // Remove hidden
-            document.getElementById('view-department').classList.remove('hidden');
+            window.switchView('department');
         };
 
         // --- Secret System Lock Logic ---
