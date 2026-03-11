@@ -23,7 +23,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'Noto Sans Lao', 'sans-serif'],
+                        // Inter for English, falls back to Phetsarath OT for Lao
+                        sans: ['Inter', '"Phetsarath OT"', '"Noto Sans Lao"', 'sans-serif'],
                         heading: ['Montserrat', 'sans-serif'],
                         aesthetic: ['Playfair Display', 'serif'],
                     },
@@ -724,7 +725,10 @@
                                 <option value="chom_sec">Chommany - Secondary</option>
                                 <option value="chom_eng">Chommany - English</option>
                             </select>
-                            <input type="text" id="tName" placeholder="Teacher Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+                            
+                            <input type="text" id="tLaoName" placeholder="Lao Name (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+                            <input type="text" id="tName" placeholder="English Name" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
+                            
                             <div class="flex gap-4">
                                 <input type="text" id="tLevel" placeholder="Level/Group (e.g. P1 Teachers)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
                                 <input type="text" id="tRoom" placeholder="Room (101)" class="w-1/2 border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50">
@@ -922,12 +926,12 @@
                 chom_eng_kg: '', chom_eng_pri: '', chom_eng_sec: ''
             },
             resources: [
-                { id: 'r_incident', name: 'Incident Report', url: '', isStatic: true },
-                { id: 'r_request', name: 'Request Form', url: '', isStatic: true },
-                { id: 'r_highlights', name: 'Monthly Highlights', url: '', isStatic: true },
-                { id: 'r_payslip', name: 'Payslip', url: '', isStatic: true },
-                { id: 'r_elibrary', name: 'Neerada e-Library', url: '', isStatic: true },
-                { id: 'r_store', name: 'Neerada Store', url: '', isStatic: true }
+                { id: 'r_incident', name: 'Incident Report (ແບບຟອມລາຍງານເຫດການ)', url: '', isStatic: true },
+                { id: 'r_request', name: 'Request Form (ແບບຟອມຄຳຮ້ອງ)', url: '', isStatic: true },
+                { id: 'r_highlights', name: 'Monthly Highlights (ຈຸດເດັ່ນປະຈຳເດືອນ)', url: '', isStatic: true },
+                { id: 'r_payslip', name: 'Payslip (ໃບບິນເງິນເດືອນ)', url: '', isStatic: true },
+                { id: 'r_elibrary', name: 'Neerada e-Library (ຫໍສະໝຸດອອນລາຍ)', url: '', isStatic: true },
+                { id: 'r_store', name: 'Neerada Online Store (ຮ້ານຄ້າອອນລາຍ)', url: '', isStatic: true }
             ]
         };
 
@@ -948,7 +952,7 @@
         let currentActiveDeptKey = sessionStorage.getItem('currentDeptKey') || '';
         let currentActiveDeptTitle = sessionStorage.getItem('currentDeptTitle') || '';
 
-        // Department mapping updated to NOT contain Lao text for Roster headers
+        // Department mapping
         const deptNames = {
             sib_kg: 'Sibounheuang - Kindergarten', sib_pri: 'Sibounheuang - Primary',
             sib_sec: 'Sibounheuang - Secondary', sib_eng: 'Sibounheuang - English',
@@ -971,63 +975,71 @@
             { key: 'chom_eng_sec', label: 'Chommany English - Secondary' }
         ];
         
-        // Map for aesthetic backgrounds for departments
+        // Map for aesthetic backgrounds for departments - Deepened the gradient shades
         const deptBackgrounds = {
             sib_kg: { 
-                bg: 'bg-gradient-to-br from-rose-50 via-white to-pink-50', 
-                orb1: 'from-rose-400/20 to-pink-500/20', 
-                orb2: 'from-red-400/10 to-orange-400/10',
+                bg: 'bg-gradient-to-br from-rose-200 via-rose-50 to-pink-200', 
+                orb1: 'from-rose-400/40 to-pink-500/40', 
+                orb2: 'from-red-400/30 to-orange-400/30',
                 btnGrad: 'from-rose-500 to-pink-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(225,29,72,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(225,29,72,0.4)]',
+                divBg: 'bg-rose-500 text-white'
             },
             sib_pri: { 
-                bg: 'bg-gradient-to-br from-sky-50 via-white to-indigo-50', 
-                orb1: 'from-sky-400/20 to-indigo-500/20', 
-                orb2: 'from-blue-400/10 to-cyan-400/10',
+                bg: 'bg-gradient-to-br from-sky-200 via-sky-50 to-indigo-200', 
+                orb1: 'from-sky-400/40 to-indigo-500/40', 
+                orb2: 'from-blue-400/30 to-cyan-400/30',
                 btnGrad: 'from-sky-500 to-indigo-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(99,102,241,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(99,102,241,0.4)]',
+                divBg: 'bg-sky-500 text-white'
             },
             sib_sec: { 
-                bg: 'bg-gradient-to-br from-emerald-50 via-white to-teal-50', 
-                orb1: 'from-emerald-400/20 to-teal-500/20', 
-                orb2: 'from-green-400/10 to-cyan-400/10',
+                bg: 'bg-gradient-to-br from-emerald-200 via-emerald-50 to-teal-200', 
+                orb1: 'from-emerald-400/40 to-teal-500/40', 
+                orb2: 'from-green-400/30 to-cyan-400/30',
                 btnGrad: 'from-emerald-500 to-teal-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(16,185,129,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(16,185,129,0.4)]',
+                divBg: 'bg-emerald-500 text-white'
             },
             sib_eng: { 
-                bg: 'bg-gradient-to-br from-violet-50 via-white to-fuchsia-50', 
-                orb1: 'from-violet-400/20 to-fuchsia-500/20', 
-                orb2: 'from-purple-400/10 to-pink-400/10',
+                bg: 'bg-gradient-to-br from-violet-200 via-violet-50 to-fuchsia-200', 
+                orb1: 'from-violet-400/40 to-fuchsia-500/40', 
+                orb2: 'from-purple-400/30 to-pink-400/30',
                 btnGrad: 'from-violet-500 to-fuchsia-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(168,85,247,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(168,85,247,0.4)]',
+                divBg: 'bg-violet-500 text-white'
             },
             chom_kg: { 
-                bg: 'bg-gradient-to-br from-amber-50 via-white to-orange-50', 
-                orb1: 'from-amber-400/20 to-orange-500/20', 
-                orb2: 'from-yellow-400/10 to-red-400/10',
+                bg: 'bg-gradient-to-br from-amber-200 via-amber-50 to-orange-200', 
+                orb1: 'from-amber-400/40 to-orange-500/40', 
+                orb2: 'from-yellow-400/30 to-red-400/30',
                 btnGrad: 'from-amber-500 to-orange-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(245,158,11,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(245,158,11,0.4)]',
+                divBg: 'bg-amber-500 text-white'
             },
             chom_pri: { 
-                bg: 'bg-gradient-to-br from-cyan-50 via-white to-blue-50', 
-                orb1: 'from-cyan-400/20 to-blue-500/20', 
-                orb2: 'from-teal-400/10 to-sky-400/10',
+                bg: 'bg-gradient-to-br from-cyan-200 via-cyan-50 to-blue-200', 
+                orb1: 'from-cyan-400/40 to-blue-500/40', 
+                orb2: 'from-teal-400/30 to-sky-400/30',
                 btnGrad: 'from-cyan-500 to-blue-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(6,182,212,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(6,182,212,0.4)]',
+                divBg: 'bg-cyan-500 text-white'
             },
             chom_sec: { 
-                bg: 'bg-gradient-to-br from-slate-100 via-white to-gray-200', 
-                orb1: 'from-slate-400/20 to-gray-500/20', 
-                orb2: 'from-blue-900/10 to-slate-800/10',
+                bg: 'bg-gradient-to-br from-slate-300 via-slate-100 to-gray-300', 
+                orb1: 'from-slate-400/40 to-gray-500/40', 
+                orb2: 'from-blue-900/30 to-slate-800/30',
                 btnGrad: 'from-slate-600 to-gray-800',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(71,85,105,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(71,85,105,0.4)]',
+                divBg: 'bg-slate-600 text-white'
             },
             chom_eng: { 
-                bg: 'bg-gradient-to-br from-rose-50 via-white to-orange-50', 
-                orb1: 'from-rose-400/20 to-orange-500/20', 
-                orb2: 'from-pink-400/10 to-red-400/10',
+                bg: 'bg-gradient-to-br from-rose-200 via-rose-50 to-orange-200', 
+                orb1: 'from-rose-400/40 to-orange-500/40', 
+                orb2: 'from-pink-400/30 to-red-400/30',
                 btnGrad: 'from-rose-500 to-orange-600',
-                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(244,63,94,0.4)]'
+                btnShadow: 'shadow-[0_8px_20px_-6px_rgba(244,63,94,0.4)]',
+                divBg: 'bg-rose-500 text-white'
             }
         };
 
@@ -1705,15 +1717,16 @@
         // --- Teacher CRUD ---
         window.submitTeacherForm = function() {
             const name = document.getElementById('tName').value.trim();
-            if (!name) return alert('Enter teacher name.');
+            if (!name) return alert('Enter English Name.');
             
+            const laoName = document.getElementById('tLaoName').value.trim();
             const level = document.getElementById('tLevel').value.trim();
             const room = document.getElementById('tRoom').value.trim();
             const department = document.getElementById('tDept').value;
             const driveLink = document.getElementById('tDriveLink').value.trim();
             const image = tempImages.teacherImageState;
 
-            const teacherData = { name, level, room, department, driveLink, order: state.teachers.length };
+            const teacherData = { name, laoName, level, room, department, driveLink, order: state.teachers.length };
             if (image !== null) teacherData.image = image;
 
             if (editingTeacherId) {
@@ -1730,6 +1743,7 @@
             
             editingTeacherId = id;
             document.getElementById('tName').value = teacher.name;
+            document.getElementById('tLaoName').value = teacher.laoName || '';
             document.getElementById('tLevel').value = teacher.level || '';
             document.getElementById('tRoom').value = teacher.room || '';
             document.getElementById('tDept').value = teacher.department;
@@ -1757,6 +1771,7 @@
         window.cancelEditTeacher = function() {
             editingTeacherId = null;
             document.getElementById('tName').value = '';
+            document.getElementById('tLaoName').value = '';
             document.getElementById('tLevel').value = '';
             document.getElementById('tRoom').value = '';
             document.getElementById('tDept').value = 'sib_kg';
@@ -1775,7 +1790,7 @@
         };
 
         window.downloadStaffTemplate = function() {
-            const csvContent = "Name,Level,Room,Department,DriveLink\nJohn Doe,P1,101,sib_pri,https://drive.google.com/...\nJane Smith,K1,KG-A,chom_kg,";
+            const csvContent = "LaoName,EnglishName,Level,Room,Department,DriveLink\nສົມຊາຍ,John Doe,P1,101,sib_pri,https://drive.google.com/...\n,Jane Smith,K1,KG-A,chom_kg,";
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
@@ -1811,16 +1826,17 @@
                     // Basic comma split - avoid using commas within the names/links in the CSV.
                     const cols = row.split(',');
                     
-                    if(cols.length >= 4) {
-                        const name = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
-                        if(!name) continue;
+                    if(cols.length >= 5) {
+                        const laoName = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
+                        const name = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
+                        if(!name && !laoName) continue;
 
-                        const level = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
-                        const room = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
-                        const department = cols[3] ? cols[3].replace(/"/g, '').trim().toLowerCase() : 'sib_kg';
-                        const driveLink = cols[4] ? cols[4].replace(/"/g, '').trim() : '';
+                        const level = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
+                        const room = cols[3] ? cols[3].replace(/"/g, '').trim() : '';
+                        const department = cols[4] ? cols[4].replace(/"/g, '').trim().toLowerCase() : 'sib_kg';
+                        const driveLink = cols[5] ? cols[5].replace(/"/g, '').trim() : '';
 
-                        const teacherData = { name, level, room, department, driveLink, order: startOrder++ };
+                        const teacherData = { laoName, name, level, room, department, driveLink, order: startOrder++ };
                         fbAddTeacher(teacherData);
                         successCount++;
                     }
@@ -1850,7 +1866,7 @@
             }
             
             filtered.forEach(t => {
-                const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f1f5f9&color=475569&bold=true';
+                const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name || t.laoName)+'&background=f1f5f9&color=475569&bold=true';
                 // Adjusting the thumbnail in the admin view to be uncut (object-contain)
                 list.innerHTML += `
                     <div class="draggable-item flex items-center justify-between bg-white border border-gray-100 p-3 rounded-xl hover:border-brand-blue/30 shadow-sm transition-all"
@@ -1866,7 +1882,7 @@
                             <div class="cursor-grab text-gray-300 hover:text-gray-500 py-2"><i data-lucide="grip-vertical" class="w-5 h-5"></i></div>
                             <img src="${pic}" class="w-10 h-14 rounded bg-gray-50 object-contain border border-gray-100 pointer-events-none">
                             <div class="pointer-events-none overflow-hidden pr-2">
-                                <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate">${t.name}</h4>
+                                <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate">${t.name} ${t.laoName ? `(${t.laoName})` : ''}</h4>
                                 <div class="text-[10px] font-medium text-gray-500 uppercase truncate">${deptNames[t.department]} | Rm: ${t.room||'-'}</div>
                                 ${t.driveLink ? `<div class="text-[10px] text-blue-500 mt-0.5"><i data-lucide="link" class="w-3 h-3 inline"></i> Link Added</div>` : ''}
                             </div>
@@ -1967,7 +1983,7 @@
             document.getElementById('mainBody').className = "antialiased min-h-screen flex flex-col transition-colors duration-1000";
             
             const viewDeptContainer = document.getElementById('view-department');
-            viewDeptContainer.className = `view-section min-h-screen relative overflow-hidden transition-colors duration-1000 ${theme.bg}`;
+            viewDeptContainer.className = `view-section active min-h-screen relative overflow-hidden transition-colors duration-1000 ${theme.bg}`;
             
             document.getElementById('deptOrb1').className = `absolute top-0 left-1/4 w-[50rem] h-[50rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-br ${theme.orb1}`;
             document.getElementById('deptOrb2').className = `absolute bottom-0 right-1/4 w-[40rem] h-[40rem] rounded-full blur-[120px] mix-blend-multiply opacity-60 animate-pulse transition-colors duration-1000 bg-gradient-to-tl ${theme.orb2}`;
@@ -1995,23 +2011,28 @@
 
                 let html = '';
                 groupKeys.forEach(g => {
-                    // Aesthetic Group Divider
+                    // Aesthetic Colored Group Divider utilizing the specific department theme colors
                     html += `
                         <div class="w-full flex flex-col items-center justify-center my-12 relative">
                             <div class="absolute inset-0 flex items-center" aria-hidden="true">
                                 <div class="w-full border-t border-gray-300/40"></div>
                             </div>
                             <div class="relative flex justify-center">
-                                <span class="bg-white/80 backdrop-blur-md px-8 py-3 rounded-2xl border border-gray-200/60 shadow-sm font-heading font-black text-gray-800 uppercase tracking-[0.2em] text-lg md:text-xl drop-shadow-sm">${g}</span>
+                                <span class="${theme.divBg} shadow-md px-8 py-3 rounded-2xl border border-white/40 font-heading font-black uppercase tracking-[0.2em] text-lg md:text-xl drop-shadow-sm">${g}</span>
                             </div>
                         </div>
                         <div class="flex flex-wrap justify-center gap-8 items-stretch w-full">
                     `;
                     
                     groups[g].forEach(t => {
-                        const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name)+'&background=f8fafc&color=334155&size=200&bold=true';
+                        const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name || t.laoName)+'&background=f8fafc&color=334155&size=200&bold=true';
                         const hrefStr = t.driveLink ? `href="${t.driveLink.startsWith('http') ? t.driveLink : 'https://'+t.driveLink}" target="_blank"` : `href="#"`;
                         const pointerClass = t.driveLink ? `cursor-pointer hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] hover:-translate-y-1.5` : `cursor-default`;
+
+                        // Check if Lao Name exists to render it elegantly above the English name
+                        const laoNameHtml = (t.laoName && t.laoName.trim() !== '') 
+                            ? `<h3 class="font-sans font-bold text-lg sm:text-xl text-gray-800 tracking-tight break-words whitespace-normal leading-tight drop-shadow-sm mb-0.5">${t.laoName}</h3>` 
+                            : '';
 
                         html += `
                             <a ${hrefStr} class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[280px] flex-shrink-0 bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-card border border-white/60 overflow-hidden flex flex-col group transition-all duration-300 ${pointerClass}">
@@ -2020,6 +2041,7 @@
                                     ${t.driveLink ? `<div class="absolute top-4 right-4 bg-brand-blue/90 text-white p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
                                 </div>
                                 <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
+                                    ${laoNameHtml}
                                     <h3 class="font-aesthetic font-bold text-xl sm:text-2xl text-gray-900 tracking-tight break-words whitespace-normal leading-tight drop-shadow-sm">${t.name}</h3>
                                     <div class="flex flex-wrap items-center justify-center gap-2 mt-1">
                                         <span class="font-heading font-bold text-gray-600 text-xs tracking-wider px-3 py-1 bg-gray-100/80 border border-gray-200/80 rounded-full">${t.level||'-'}</span>
