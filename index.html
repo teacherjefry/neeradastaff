@@ -937,7 +937,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -961,7 +961,11 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        
+        // Enable Offline Persistence for INSTANT data loading on refresh
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+        });
 
         // Secure Paths - Adapts to environment safely
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
@@ -1221,7 +1225,7 @@
                 if (isFirstLoad && loadedSettings && loadedTeachers && loadedEvents) {
                     if(loading) {
                         loading.style.opacity = '0';
-                        setTimeout(() => loading.classList.add('hidden'), 500);
+                        setTimeout(() => loading.classList.add('hidden'), 150); // Faster fade out
                     }
                     
                     updateAuthUI();
