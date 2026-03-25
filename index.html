@@ -132,7 +132,7 @@
         .draggable-item.drag-over { border-top: 2px solid #005bc5; background-color: #eff6ff; }
         
         /* Loading Overlay */
-        #firebaseLoading { transition: opacity 0.5s ease; }
+        #firebaseLoading { transition: opacity 0.15s ease; }
 
         /* Breathing Blue-Green Gradient */
         .breathing-blue-green {
@@ -962,7 +962,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Enable Offline Persistence for INSTANT data loading on refresh
+        // Enable Offline Persistence for INSTANT data loading
         const db = initializeFirestore(app, {
             localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
         });
@@ -1225,7 +1225,7 @@
                 if (isFirstLoad && loadedSettings && loadedTeachers && loadedEvents) {
                     if(loading) {
                         loading.style.opacity = '0';
-                        setTimeout(() => loading.classList.add('hidden'), 150); // Faster fade out
+                        setTimeout(() => loading.classList.add('hidden'), 150);
                     }
                     
                     updateAuthUI();
