@@ -806,7 +806,7 @@
                             <input type="url" id="tDriveLink" placeholder="Personal Google Drive Folder URL (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
 
                             <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
-                                <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 400)">
+                                <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 150)">
                                 <div id="teacherImgPreviewContainer" class="hidden flex flex-col items-center">
                                     <img id="teacherImgPreview" class="w-16 h-20 object-contain rounded border border-gray-200 mb-3 shadow-sm bg-gray-100">
                                     <span class="text-xs font-medium text-indigo-600">Photo Selected</span>
@@ -1202,14 +1202,16 @@
             const banner = document.createElement('div');
             banner.id = 'fb-error-banner';
             banner.className = 'fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] text-sm text-center font-bold font-sans flex items-center justify-center gap-3 border border-red-400';
-            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Blocked!</b> Firebase Security Rules are preventing data from loading. Check your Firestore Rules.</span>';
+            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Error!</b> Firebase blocked the connection. Check your rules.</span>';
             document.body.appendChild(banner);
             lucide.createIcons();
             setTimeout(() => { if (banner) banner.remove(); }, 8000);
         }
 
         // Setup real-time connection to Firebase
-        function setupRealtimeListeners() {
+        function setupRealtimeListeners(user) {
+            if (!user) return; // Guard clause against unauthenticated calls
+            
             const loading = document.getElementById('firebaseLoading');
             let isFirstLoad = true;
             let loadedSettings = false;
@@ -1237,6 +1239,17 @@
                     isFirstLoad = false;
                 }
             };
+
+            // FAILSAFE: Force the UI to load from cache after 3 seconds if network is lagging or rules block data
+            setTimeout(() => {
+                if (isFirstLoad) {
+                    console.warn("Data stream delayed. Forcing instant UI reveal from cache.");
+                    loadedSettings = true;
+                    loadedTeachers = true;
+                    loadedEvents = true;
+                    checkInitialLoadComplete();
+                }
+            }, 3000);
             
             // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
@@ -1325,6 +1338,25 @@
                 loadedEvents = true; checkInitialLoadComplete();
             });
         }
+
+        // --- Auth Initialization ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                // Call listeners strictly AFTER authentication succeeds
+                setupRealtimeListeners(auth.currentUser);
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                showFirebaseErrorBanner(error);
+            }
+        };
+
+        // Trigger authentication sequence
+        initAuth();
 
         // Firebase Write Operations
         async function fbSaveSettings() {
@@ -1823,7 +1855,7 @@
                          if (width > 200) { height *= 200 / width; width = 200; }
                     } else {
                          // Teacher Profile Photos - Make them tiny avatars to save massive space!
-                         if (width > 250) { height *= 250 / width; width = 250; } 
+                         if (width > 150) { height *= 150 / width; width = 150; } 
                     }
                     
                     canvas.width = width; canvas.height = height;
