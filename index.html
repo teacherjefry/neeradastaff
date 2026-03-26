@@ -806,7 +806,7 @@
                             <input type="url" id="tDriveLink" placeholder="Personal Google Drive Folder URL (Optional)" class="w-full border border-gray-200 rounded-xl p-3.5 text-sm focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none bg-gray-50 text-gray-700">
 
                             <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center relative hover:bg-gray-50 transition-colors cursor-pointer group bg-white">
-                                <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 150)">
+                                <input type="file" id="adminTeacherFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="processImageUpload(event, 'teacherImageState', 'teacherImgPreview', 400)">
                                 <div id="teacherImgPreviewContainer" class="hidden flex flex-col items-center">
                                     <img id="teacherImgPreview" class="w-16 h-20 object-contain rounded border border-gray-200 mb-3 shadow-sm bg-gray-100">
                                     <span class="text-xs font-medium text-indigo-600">Photo Selected</span>
@@ -865,7 +865,7 @@
                     </div>
 
                     <!-- Manage Teachers List (Drag & Drop) -->
-                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8 flex flex-col max-h-[550px]">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border border-gray-100 p-8 flex flex-col max-h-[650px]">
                         <div class="flex flex-col sm:flex-row justify-between mb-6 gap-4 items-start sm:items-center">
                             <div class="flex items-center gap-4">
                                 <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200"><i data-lucide="users" class="text-gray-600 w-5 h-5"></i></div>
@@ -874,7 +874,7 @@
                                     <p class="text-[10px] text-gray-400 font-medium">Drag grip to reorder</p>
                                 </div>
                             </div>
-                            <select id="filterDept" onchange="renderAdminTeachers()" class="border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-none focus:border-brand-blue bg-gray-50 text-gray-700 cursor-pointer font-sans">
+                            <select id="filterDept" onchange="window.adminTeacherPage = 1; renderAdminTeachers()" class="border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-none focus:border-brand-blue bg-gray-50 text-gray-700 cursor-pointer font-sans">
                                 <option value="all">All Depts</option>
                                 <option value="sib_kg">Sib - KG</option><option value="sib_pri">Sib - Pri</option><option value="sib_sec">Sib - Sec</option><option value="sib_eng">Sib - Eng</option>
                                 <option value="chom_kg">Chom - KG</option><option value="chom_pri">Chom - Pri</option><option value="chom_sec">Chom - Sec</option><option value="chom_eng">Chom - Eng</option>
@@ -938,7 +938,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, CACHE_SIZE_UNLIMITED, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -962,14 +962,26 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        
+        // Enable Offline Persistence for INSTANT data loading with 100MB Capacity for Mobile safety
+        let db;
+        try {
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({
+                    tabManager: persistentSingleTabManager(),
+                    cacheSizeBytes: CACHE_SIZE_UNLIMITED // Allow massive data to cache safely on mobile
+                })
+            });
+        } catch (e) {
+            console.warn("Ultra-fast cache initialization failed. Using standard connection.", e);
+            db = getFirestore(app);
+        }
 
         // Secure Paths - ALWAYS syncs to Firebase Cloud Database securely
-        const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'default-app-id';
-        
-        // Helper functions for safe paths matching Canvas Rules
-        const getPublicCollection = (colName) => collection(db, 'artifacts', appId, 'public', 'data', colName);
-        const getPublicDoc = (colName, docId) => doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
+        const getColPath = (col) => {
+            return `artifacts/${appId}/public/data/${col}`; 
+        };
 
         // --- Data & State ---
         let state = {
@@ -1190,16 +1202,14 @@
             const banner = document.createElement('div');
             banner.id = 'fb-error-banner';
             banner.className = 'fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] text-sm text-center font-bold font-sans flex items-center justify-center gap-3 border border-red-400';
-            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Error!</b> ກະລຸນາກວດສອບສິດທິ Firebase Security Rules ຂອງທ່ານ.</span>';
+            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Blocked!</b> Firebase Security Rules are preventing data from loading. Check your Firestore Rules.</span>';
             document.body.appendChild(banner);
             lucide.createIcons();
             setTimeout(() => { if (banner) banner.remove(); }, 8000);
         }
 
         // Setup real-time connection to Firebase
-        function setupRealtimeListeners(user) {
-            if (!user) return; // Guard clause against unauthenticated calls
-            
+        function setupRealtimeListeners() {
             const loading = document.getElementById('firebaseLoading');
             let isFirstLoad = true;
             let loadedSettings = false;
@@ -1227,9 +1237,9 @@
                     isFirstLoad = false;
                 }
             };
-
-            // Listen to General Settings (Waits for Auth, then syncs)
-            onSnapshot(getPublicDoc('portal_settings', 'main'), (docSnap) => {
+            
+            // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
+            onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     state.announcement = data.announcement || '';
@@ -1276,8 +1286,8 @@
                 loadedSettings = true; checkInitialLoadComplete();
             });
 
-            // Listen to Teachers
-            onSnapshot(getPublicCollection('portal_teachers'), (querySnapshot) => {
+            // Listen to Teachers (Instantly loads from Cache, then syncs to Cloud)
+            onSnapshot(collection(db, getColPath('portal_teachers')), (querySnapshot) => {
                 state.teachers = [];
                 querySnapshot.forEach((doc) => {
                     state.teachers.push({ id: doc.id, ...doc.data() });
@@ -1288,7 +1298,10 @@
                 if (document.getElementById('view-department').classList.contains('active') && currentActiveDeptKey) {
                     window.showDepartment(currentActiveDeptKey, currentActiveDeptTitle);
                 }
-                window.renderAdminTeachers();
+                
+                if (window.renderAdminTeachers) {
+                    window.renderAdminTeachers();
+                }
                 loadedTeachers = true;
                 checkInitialLoadComplete();
             }, (error) => {
@@ -1297,8 +1310,8 @@
                 loadedTeachers = true; checkInitialLoadComplete();
             });
 
-            // Listen to Events
-            onSnapshot(getPublicCollection('portal_events'), (querySnapshot) => {
+            // Listen to Events (Instantly loads from Cache, then syncs to Cloud)
+            onSnapshot(collection(db, getColPath('portal_events')), (querySnapshot) => {
                 state.events = [];
                 querySnapshot.forEach((doc) => {
                     state.events.push({ id: doc.id, ...doc.data() });
@@ -1313,37 +1326,10 @@
             });
         }
 
-        // --- Auth Initialization ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                showFirebaseErrorBanner(error);
-            }
-        };
-
-        // Call auth first
-        initAuth();
-
-        // Listen for auth state change to trigger database listeners
-        let listenersSetup = false;
-        onAuthStateChanged(auth, (user) => {
-            if (user && !listenersSetup) {
-                listenersSetup = true;
-                setupRealtimeListeners(user);
-            }
-        });
-
         // Firebase Write Operations
         async function fbSaveSettings() {
-            if (!auth.currentUser) return;
             try {
-                await setDoc(getPublicDoc('portal_settings', 'main'), {
+                await setDoc(doc(db, getColPath('portal_settings'), 'main'), {
                     announcement: state.announcement,
                     menu: state.menu,
                     driveLinks: state.driveLinks,
@@ -1357,45 +1343,39 @@
         }
 
         async function fbAddTeacher(teacherData) {
-            if (!auth.currentUser) return;
             try {
-                await addDoc(getPublicCollection('portal_teachers'), teacherData);
+                await addDoc(collection(db, getColPath('portal_teachers')), teacherData);
             } catch (e) { console.error("Error adding teacher", e); alert("Failed to add. Image might be too large."); }
         }
 
         async function fbUpdateTeacher(id, teacherData) {
-            if (!auth.currentUser) return;
             try {
-                await updateDoc(getPublicDoc('portal_teachers', id), teacherData);
+                await updateDoc(doc(db, getColPath('portal_teachers'), id), teacherData);
             } catch (e) { console.error("Error updating teacher", e); alert("Failed to update."); }
         }
 
         async function fbDeleteTeacher(id) {
-            if (!auth.currentUser) return;
             try {
-                await deleteDoc(getPublicDoc('portal_teachers', id));
+                await deleteDoc(doc(db, getColPath('portal_teachers'), id));
             } catch (e) { console.error("Error deleting teacher", e); }
         }
 
         async function fbUpdateTeacherOrder() {
-            if (!auth.currentUser) return;
             // Bulk update order
             state.teachers.forEach((t, idx) => {
-                updateDoc(getPublicDoc('portal_teachers', t.id), { order: idx }).catch(e=>{});
+                updateDoc(doc(db, getColPath('portal_teachers'), t.id), { order: idx }).catch(e=>{});
             });
         }
 
         async function fbAddEvent(eventData) {
-            if (!auth.currentUser) return;
             try {
-                await addDoc(getPublicCollection('portal_events'), eventData);
+                await addDoc(collection(db, getColPath('portal_events')), eventData);
             } catch (e) { console.error(e); }
         }
 
         async function fbDeleteEvent(id) {
-            if (!auth.currentUser) return;
             try {
-                await deleteDoc(getPublicDoc('portal_events', id));
+                await deleteDoc(doc(db, getColPath('portal_events'), id));
             } catch (e) { console.error(e); }
         }
 
@@ -1726,6 +1706,7 @@
                 }
             });
             
+            window.adminTeacherPage = 1; // Reset to page 1 when opening forms
             window.renderAdminTeachers();
             window.renderDriveLinksForm();
             window.renderAdminResourcesForm();
@@ -1822,6 +1803,7 @@
             alert("Announcement Saved!");
         };
 
+        // IMAGE COMPRESSION ENGINE - Optimized for 100+ Staff Payload
         window.processImageUpload = function(event, stateKey, previewImgId, maxWidth = 800) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1841,15 +1823,15 @@
                          if (width > 200) { height *= 200 / width; width = 200; }
                     } else {
                          // Teacher Profile Photos - Make them tiny avatars to save massive space!
-                         if (width > 150) { height *= 150 / width; width = 150; } 
+                         if (width > 250) { height *= 250 / width; width = 250; } 
                     }
                     
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Force JPEG with 50% quality for massive space savings
+                    // Force JPEG with 60% quality (0.6) for massive space savings as requested
                     let fileType = 'image/jpeg';
-                    let compression = 0.5; 
+                    let compression = 0.6; 
                     
                     if (stateKey === 'logoImageState') {
                         fileType = 'image/png'; // Only logo gets PNG for transparency
@@ -1894,6 +1876,7 @@
                 if (draggedIdx > -1 && targetIdx > -1) {
                     const [draggedItem] = state.teachers.splice(draggedIdx, 1);
                     state.teachers.splice(targetIdx, 0, draggedItem);
+                    window.adminTeacherPage = 1;
                     window.renderAdminTeachers(); // Update UI immediately
                     fbUpdateTeacherOrder(); // Send batch updates
                 }
@@ -2042,10 +2025,19 @@
             }
         };
 
+        // ADMIN PANEL PAGINATION
+        window.adminTeacherPage = 1;
+        const ADMIN_ITEMS_PER_PAGE = 20;
+
+        window.changeAdminPage = function(direction) {
+            window.adminTeacherPage += direction;
+            window.renderAdminTeachers();
+        };
+
         window.renderAdminTeachers = function() {
             const list = document.getElementById('adminTeacherList');
             const filter = document.getElementById('filterDept').value;
-            list.innerHTML = '';
+            
             let filtered = filter === 'all' ? state.teachers : state.teachers.filter(t => t.department === filter);
             
             if(filtered.length === 0) { 
@@ -2053,9 +2045,18 @@
                 return; 
             }
             
-            filtered.forEach(t => {
+            // Apply Pagination
+            const totalPages = Math.ceil(filtered.length / ADMIN_ITEMS_PER_PAGE);
+            if (window.adminTeacherPage > totalPages) window.adminTeacherPage = totalPages;
+            if (window.adminTeacherPage < 1) window.adminTeacherPage = 1;
+
+            const startIndex = (window.adminTeacherPage - 1) * ADMIN_ITEMS_PER_PAGE;
+            const paginatedTeachers = filtered.slice(startIndex, startIndex + ADMIN_ITEMS_PER_PAGE);
+
+            list.innerHTML = '';
+            
+            paginatedTeachers.forEach(t => {
                 const pic = t.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(t.name || t.laoName)+'&background=f1f5f9&color=475569&bold=true';
-                // Adjusting the thumbnail in the admin view to be uncut (object-contain)
                 list.innerHTML += `
                     <div class="draggable-item flex items-center justify-between bg-white border border-gray-100 p-3 rounded-xl hover:border-brand-blue/30 shadow-sm transition-all"
                          draggable="true" 
@@ -2068,7 +2069,7 @@
                         
                         <div class="flex items-center gap-3 w-full">
                             <div class="cursor-grab text-gray-300 hover:text-gray-500 py-2"><i data-lucide="grip-vertical" class="w-5 h-5"></i></div>
-                            <img src="${pic}" class="w-10 h-14 rounded bg-gray-50 object-contain border border-gray-100 pointer-events-none">
+                            <img src="${pic}" loading="lazy" class="w-10 h-14 rounded bg-gray-50 object-contain border border-gray-100 pointer-events-none">
                             <div class="pointer-events-none overflow-hidden pr-2">
                                 <h4 class="font-semibold text-sm text-gray-800 leading-tight truncate font-sans">${t.name} ${t.laoName ? `(${t.laoName})` : ''}</h4>
                                 <div class="text-[10px] font-medium text-gray-500 uppercase truncate">${deptNames[t.department]} | Rm: ${t.room||'-'}</div>
@@ -2081,6 +2082,18 @@
                         </div>
                     </div>`;
             });
+            
+            // Add Pagination Controls
+            if (totalPages > 1) {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100 pb-2">
+                        <button onclick="changeAdminPage(-1)" class="px-4 py-1.5 bg-gray-100 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-200 transition-colors ${window.adminTeacherPage === 1 ? 'opacity-50 pointer-events-none' : ''}">Previous</button>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Page ${window.adminTeacherPage} / ${totalPages}</span>
+                        <button onclick="changeAdminPage(1)" class="px-4 py-1.5 bg-gray-100 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-200 transition-colors ${window.adminTeacherPage === totalPages ? 'opacity-50 pointer-events-none' : ''}">Next</button>
+                    </div>
+                `;
+            }
+            
             lucide.createIcons();
         };
 
@@ -2279,10 +2292,11 @@
                             ? `<h3 class="font-sans font-bold text-lg sm:text-xl text-gray-800 tracking-tight break-words whitespace-normal leading-tight drop-shadow-sm mb-0.5">${t.laoName}</h3>` 
                             : '';
 
+                        // FADE IN LAZY LOAD SETUP - Cards start invisible and translated down
                         html += `
-                            <a ${hrefStr} class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[280px] flex-shrink-0 bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-card border border-white/60 overflow-hidden flex flex-col group transition-all duration-300 ${pointerClass}">
+                            <a ${hrefStr} class="teacher-card opacity-0 translate-y-8 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[280px] flex-shrink-0 bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-card border border-white/60 overflow-hidden flex flex-col group transition-all duration-700 ease-out ${pointerClass}">
                                 <div class="w-full aspect-[3/4] bg-gradient-to-b from-gray-50/50 to-gray-100/50 relative overflow-hidden flex items-center justify-center p-3 border-b border-gray-100/50">
-                                    <img src="${pic}" class="w-full h-full object-contain rounded-2xl group-hover:scale-[1.03] transition-transform duration-500 drop-shadow-sm">
+                                    <img src="${pic}" loading="lazy" class="w-full h-full object-contain rounded-2xl group-hover:scale-[1.03] transition-transform duration-500 drop-shadow-sm">
                                     ${t.driveLink ? `<div class="absolute top-4 right-4 bg-brand-blue/90 text-white p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300"><i data-lucide="external-link" class="w-4 h-4"></i></div>` : ''}
                                 </div>
                                 <div class="p-6 text-center flex-grow flex flex-col justify-center gap-2">
@@ -2299,6 +2313,24 @@
                     html += `</div>`;
                 });
                 container.innerHTML = html;
+                
+                // --- SCROLL TO VIEW LAZY LOAD ANIMATION ---
+                // Wait for DOM to insert HTML, then attach observer
+                setTimeout(() => {
+                    const observer = new IntersectionObserver((entries, obs) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                // Fade in and slide up smoothly when card enters viewport
+                                entry.target.classList.remove('opacity-0', 'translate-y-8');
+                                obs.unobserve(entry.target);
+                            }
+                        });
+                    }, { rootMargin: '0px 0px 50px 0px' });
+                    
+                    container.querySelectorAll('.teacher-card').forEach(card => {
+                        observer.observe(card);
+                    });
+                }, 50);
             }
             
             // Build the upload box dynamically
