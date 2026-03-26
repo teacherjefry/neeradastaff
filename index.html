@@ -937,7 +937,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -962,13 +962,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Enable Offline Persistence for INSTANT data loading with 1GB Capacity (Ultra Fast)
+        // Enable Offline Persistence for INSTANT data loading with 100MB Capacity for Mobile safety
         let db;
         try {
             db = initializeFirestore(app, {
                 localCache: persistentLocalCache({
-                    tabManager: persistentMultipleTabManager(),
-                    cacheSizeBytes: 1048576000 // 1 GB Capacity (1000 * 1024 * 1024 bytes)
+                    tabManager: persistentSingleTabManager(),
+                    cacheSizeBytes: 104857600 // 100 MB Capacity
                 })
             });
         } catch (e) {
@@ -1219,6 +1219,17 @@
             renderResourcesMenu();
         }
 
+        function showFirebaseErrorBanner(err) {
+            if (document.getElementById('fb-error-banner')) return;
+            const banner = document.createElement('div');
+            banner.id = 'fb-error-banner';
+            banner.className = 'fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] text-sm text-center font-bold font-sans flex items-center justify-center gap-3 border border-red-400';
+            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Blocked!</b> Firebase Security Rules are preventing data from loading. Check your Firestore Rules.</span>';
+            document.body.appendChild(banner);
+            lucide.createIcons();
+            setTimeout(() => { if (banner) banner.remove(); }, 8000);
+        }
+
         // Setup real-time connection to Firebase
         function setupRealtimeListeners() {
             const loading = document.getElementById('firebaseLoading');
@@ -1304,6 +1315,7 @@
                 }
             }, (error) => {
                 console.error("Settings Firebase Error:", error);
+                showFirebaseErrorBanner(error);
                 loadedSettings = true; checkInitialLoadComplete();
             });
 
@@ -1324,6 +1336,7 @@
                 checkInitialLoadComplete();
             }, (error) => {
                 console.error("Teachers Firebase Error:", error);
+                showFirebaseErrorBanner(error);
                 loadedTeachers = true; checkInitialLoadComplete();
             });
 
@@ -1338,6 +1351,7 @@
                 checkInitialLoadComplete();
             }, (error) => {
                 console.error("Events Firebase Error:", error);
+                showFirebaseErrorBanner(error);
                 loadedEvents = true; checkInitialLoadComplete();
             });
         }
