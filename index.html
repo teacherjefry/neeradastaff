@@ -1259,17 +1259,6 @@
                     isFirstLoad = false;
                 }
             };
-
-            // FAILSAFE: Force the UI to load from cache after 2.5 seconds if network is lagging or rules block data
-            setTimeout(() => {
-                if (isFirstLoad) {
-                    console.warn("Data stream delayed. Forcing instant UI reveal from cache.");
-                    loadedSettings = true;
-                    loadedTeachers = true;
-                    loadedEvents = true;
-                    checkInitialLoadComplete();
-                }
-            }, 2500);
             
             // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
