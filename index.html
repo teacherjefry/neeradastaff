@@ -91,13 +91,13 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Breathing Deep Academic overlay for the Hero */
+        /* Breathing Blue, Green, White overlay for the Hero */
         .hero-overlay-breathing {
             position: absolute;
             inset: 0;
-            background: linear-gradient(-45deg, rgba(0, 40, 100, 0.9), rgba(0, 80, 50, 0.85), rgba(15, 30, 60, 0.9), rgba(0, 60, 120, 0.85));
+            background: linear-gradient(-45deg, rgba(0, 91, 197, 0.85), rgba(0, 168, 67, 0.75), rgba(255, 255, 255, 0.35), rgba(0, 66, 145, 0.85));
             background-size: 300% 300%;
-            animation: hero-gradient-breath 15s ease infinite;
+            animation: hero-gradient-breath 12s ease infinite;
         }
 
         /* Mobile specific overrides to make the hero image much more visible */
@@ -107,7 +107,7 @@
             }
             .hero-overlay-breathing {
                 /* Using background-image so we don't reset the background-size/animation */
-                background-image: linear-gradient(-45deg, rgba(0, 40, 100, 0.7), rgba(0, 80, 50, 0.65), rgba(15, 30, 60, 0.7), rgba(0, 60, 120, 0.65));
+                background-image: linear-gradient(-45deg, rgba(0, 91, 197, 0.65), rgba(0, 168, 67, 0.55), rgba(255, 255, 255, 0.2), rgba(0, 66, 145, 0.65));
             }
         }
 
@@ -132,7 +132,7 @@
         .draggable-item.drag-over { border-top: 2px solid #005bc5; background-color: #eff6ff; }
         
         /* Loading Overlay */
-        #firebaseLoading { transition: opacity 0.15s ease; }
+        #firebaseLoading { transition: opacity 0.5s ease; }
 
         /* Breathing Blue-Green Gradient */
         .breathing-blue-green {
@@ -398,18 +398,18 @@
 
                 <div class="max-w-4xl mx-auto relative z-10 flex flex-col items-center">
                     
-                    <div class="font-aesthetic italic text-4xl md:text-5xl lg:text-6xl font-bold mb-3 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600" style="filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.6));">
+                    <div class="font-aesthetic italic text-4xl md:text-6xl font-semibold mb-2 tracking-wide text-white" style="filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.7)); -webkit-text-stroke: 1px rgba(0, 40, 100, 0.4);">
                         Neerada School
                     </div>
                     
-                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-[0.15em] mb-6 leading-tight text-white" style="text-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5);">
+                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-[0.1em] mb-6 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-white to-emerald-600" style="filter: drop-shadow(0px 8px 20px rgba(0,0,0,0.7)); -webkit-text-stroke: 2px #001633;">
                         STAFF HUB
                     </h1>
                     
-                    <!-- Professional frosted glass box for subtitle -->
-                    <p class="text-lg md:text-xl font-normal text-gray-50 max-w-2xl mx-auto bg-slate-900/50 backdrop-blur-lg px-8 py-6 rounded-2xl border border-white/10 leading-relaxed font-sans shadow-2xl">
+                    <!-- Changed box to slate-900/30 so the text remains easy to read when the bright white gradient sweeps across -->
+                    <p class="text-lg md:text-xl font-normal text-gray-100 max-w-2xl mx-auto bg-slate-900/40 backdrop-blur-md px-8 py-5 rounded-3xl border border-white/20 leading-relaxed font-sans shadow-2xl">
                         Access resources, manage info, and stay updated.
-                        <span class="block mt-2 text-base text-gray-300 font-medium tracking-wide">ເຂົ້າເຖິງຂໍ້ມູນ, ຊັບພະຍາກອນ ແລະ ຂ່າວສານໃໝ່ໆຂອງໂຮງຮຽນ.</span>
+                        <span class="block mt-2 text-base text-gray-200 font-medium tracking-wide">ເຂົ້າເຖິງຂໍ້ມູນ, ຊັບພະຍາກອນ ແລະ ຂ່າວສານໃໝ່ໆຂອງໂຮງຮຽນ.</span>
                     </p>
                 </div>
             </div>
@@ -937,7 +937,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -961,25 +961,15 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // Enable Offline Persistence for INSTANT data loading with 100MB Capacity for Mobile safety
-        let db;
-        try {
-            db = initializeFirestore(app, {
-                localCache: persistentLocalCache({
-                    tabManager: persistentSingleTabManager(),
-                    cacheSizeBytes: 104857600 // 100 MB Capacity
-                })
-            });
-        } catch (e) {
-            console.warn("Ultra-fast cache initialization failed. Using standard connection.", e);
-            db = getFirestore(app);
-        }
+        const db = getFirestore(app);
 
-        // Secure Paths - ALWAYS syncs to Firebase Cloud Database securely
+        // Secure Paths - Adapts to environment safely
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
         const getColPath = (col) => {
-            return `artifacts/${appId}/public/data/${col}`; 
+            if (typeof __app_id !== 'undefined') {
+                return `artifacts/${appId}/public/data/${col}`;
+            }
+            return col; 
         };
 
         // --- Data & State ---
@@ -1219,17 +1209,6 @@
             renderResourcesMenu();
         }
 
-        function showFirebaseErrorBanner(err) {
-            if (document.getElementById('fb-error-banner')) return;
-            const banner = document.createElement('div');
-            banner.id = 'fb-error-banner';
-            banner.className = 'fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] text-sm text-center font-bold font-sans flex items-center justify-center gap-3 border border-red-400';
-            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Blocked!</b> Firebase Security Rules are preventing data from loading. Check your Firestore Rules.</span>';
-            document.body.appendChild(banner);
-            lucide.createIcons();
-            setTimeout(() => { if (banner) banner.remove(); }, 8000);
-        }
-
         // Setup real-time connection to Firebase
         function setupRealtimeListeners() {
             const loading = document.getElementById('firebaseLoading');
@@ -1242,7 +1221,7 @@
                 if (isFirstLoad && loadedSettings && loadedTeachers && loadedEvents) {
                     if(loading) {
                         loading.style.opacity = '0';
-                        setTimeout(() => loading.classList.add('hidden'), 150);
+                        setTimeout(() => loading.classList.add('hidden'), 500);
                     }
                     
                     updateAuthUI();
@@ -1260,7 +1239,7 @@
                 }
             };
             
-            // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
+            // Listen to General Settings
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -1302,13 +1281,9 @@
                     document.getElementById('announcementBox').classList.remove('scale-95');
                     announcementShown = true;
                 }
-            }, (error) => {
-                console.error("Settings Firebase Error:", error);
-                showFirebaseErrorBanner(error);
-                loadedSettings = true; checkInitialLoadComplete();
             });
 
-            // Listen to Teachers (Instantly loads from Cache, then syncs to Cloud)
+            // Listen to Teachers
             onSnapshot(collection(db, getColPath('portal_teachers')), (querySnapshot) => {
                 state.teachers = [];
                 querySnapshot.forEach((doc) => {
@@ -1323,13 +1298,9 @@
                 window.renderAdminTeachers();
                 loadedTeachers = true;
                 checkInitialLoadComplete();
-            }, (error) => {
-                console.error("Teachers Firebase Error:", error);
-                showFirebaseErrorBanner(error);
-                loadedTeachers = true; checkInitialLoadComplete();
             });
 
-            // Listen to Events (Instantly loads from Cache, then syncs to Cloud)
+            // Listen to Events
             onSnapshot(collection(db, getColPath('portal_events')), (querySnapshot) => {
                 state.events = [];
                 querySnapshot.forEach((doc) => {
@@ -1338,10 +1309,6 @@
                 window.renderCalendar();
                 loadedEvents = true;
                 checkInitialLoadComplete();
-            }, (error) => {
-                console.error("Events Firebase Error:", error);
-                showFirebaseErrorBanner(error);
-                loadedEvents = true; checkInitialLoadComplete();
             });
         }
 
