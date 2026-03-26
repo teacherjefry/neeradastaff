@@ -937,7 +937,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -962,18 +962,24 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Enable Offline Persistence for INSTANT data loading
-        const db = initializeFirestore(app, {
-            localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-        });
+        // Enable Offline Persistence for INSTANT data loading with 1GB Capacity (Ultra Fast)
+        let db;
+        try {
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({
+                    tabManager: persistentMultipleTabManager(),
+                    cacheSizeBytes: 1048576000 // 1 GB Capacity (1000 * 1024 * 1024 bytes)
+                })
+            });
+        } catch (e) {
+            console.warn("Ultra-fast cache initialization failed. Using standard connection.", e);
+            db = getFirestore(app);
+        }
 
-        // Secure Paths - Adapts to environment safely
+        // Secure Paths - ALWAYS syncs to Firebase Cloud Database securely
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
         const getColPath = (col) => {
-            if (typeof __app_id !== 'undefined') {
-                return `artifacts/${appId}/public/data/${col}`;
-            }
-            return col; 
+            return `artifacts/${appId}/public/data/${col}`; 
         };
 
         // --- Data & State ---
@@ -1243,7 +1249,7 @@
                 }
             };
             
-            // Listen to General Settings
+            // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
             onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -1285,9 +1291,12 @@
                     document.getElementById('announcementBox').classList.remove('scale-95');
                     announcementShown = true;
                 }
+            }, (error) => {
+                console.error("Settings Firebase Error:", error);
+                loadedSettings = true; checkInitialLoadComplete();
             });
 
-            // Listen to Teachers
+            // Listen to Teachers (Instantly loads from Cache, then syncs to Cloud)
             onSnapshot(collection(db, getColPath('portal_teachers')), (querySnapshot) => {
                 state.teachers = [];
                 querySnapshot.forEach((doc) => {
@@ -1302,9 +1311,12 @@
                 window.renderAdminTeachers();
                 loadedTeachers = true;
                 checkInitialLoadComplete();
+            }, (error) => {
+                console.error("Teachers Firebase Error:", error);
+                loadedTeachers = true; checkInitialLoadComplete();
             });
 
-            // Listen to Events
+            // Listen to Events (Instantly loads from Cache, then syncs to Cloud)
             onSnapshot(collection(db, getColPath('portal_events')), (querySnapshot) => {
                 state.events = [];
                 querySnapshot.forEach((doc) => {
@@ -1313,6 +1325,9 @@
                 window.renderCalendar();
                 loadedEvents = true;
                 checkInitialLoadComplete();
+            }, (error) => {
+                console.error("Events Firebase Error:", error);
+                loadedEvents = true; checkInitialLoadComplete();
             });
         }
 
