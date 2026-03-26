@@ -938,7 +938,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, CACHE_SIZE_UNLIMITED, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         lucide.createIcons();
 
@@ -962,26 +962,14 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // Enable Offline Persistence for INSTANT data loading with 100MB Capacity for Mobile safety
-        let db;
-        try {
-            db = initializeFirestore(app, {
-                localCache: persistentLocalCache({
-                    tabManager: persistentSingleTabManager(),
-                    cacheSizeBytes: CACHE_SIZE_UNLIMITED // Allow massive data to cache safely on mobile
-                })
-            });
-        } catch (e) {
-            console.warn("Ultra-fast cache initialization failed. Using standard connection.", e);
-            db = getFirestore(app);
-        }
+        const db = getFirestore(app);
 
         // Secure Paths - ALWAYS syncs to Firebase Cloud Database securely
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'neerada-staff';
-        const getColPath = (col) => {
-            return `artifacts/${appId}/public/data/${col}`; 
-        };
+        const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'default-app-id';
+        
+        // Helper functions for safe paths matching Canvas Rules
+        const getPublicCollection = (colName) => collection(db, 'artifacts', appId, 'public', 'data', colName);
+        const getPublicDoc = (colName, docId) => doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
 
         // --- Data & State ---
         let state = {
@@ -1132,29 +1120,6 @@
             friday: 'bg-blue-50/70 border-blue-200 text-blue-900'
         };
 
-        // --- Authentication & Initialization ---
-        async function initFirebase() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                const loading = document.getElementById('firebaseLoading');
-                loading.className = "fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center";
-                loading.innerHTML = '<div class="text-center p-6"><i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i><h2 class="font-heading font-bold text-xl text-gray-800">Database Connection Failed</h2><p class="text-gray-500 mt-2">Please check your Firebase configuration and rules.</p></div>';
-                lucide.createIcons();
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setupRealtimeListeners();
-            }
-        });
-
         function updateAuthUI() {
             const hBtn = document.getElementById('headerLoginBtn');
             const dBtn = document.getElementById('drawerLoginBtn');
@@ -1225,14 +1190,16 @@
             const banner = document.createElement('div');
             banner.id = 'fb-error-banner';
             banner.className = 'fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl shadow-2xl z-[9999] text-sm text-center font-bold font-sans flex items-center justify-center gap-3 border border-red-400';
-            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Blocked!</b> Firebase Security Rules are preventing data from loading. Check your Firestore Rules.</span>';
+            banner.innerHTML = '<i data-lucide="alert-octagon" class="w-6 h-6 shrink-0"></i> <span><b>Database Error!</b> ກະລຸນາກວດສອບສິດທິ Firebase Security Rules ຂອງທ່ານ.</span>';
             document.body.appendChild(banner);
             lucide.createIcons();
             setTimeout(() => { if (banner) banner.remove(); }, 8000);
         }
 
         // Setup real-time connection to Firebase
-        function setupRealtimeListeners() {
+        function setupRealtimeListeners(user) {
+            if (!user) return; // Guard clause against unauthenticated calls
+            
             const loading = document.getElementById('firebaseLoading');
             let isFirstLoad = true;
             let loadedSettings = false;
@@ -1260,9 +1227,9 @@
                     isFirstLoad = false;
                 }
             };
-            
-            // Listen to General Settings (Instantly loads from Cache, then syncs to Cloud)
-            onSnapshot(doc(db, getColPath('portal_settings'), 'main'), (docSnap) => {
+
+            // Listen to General Settings (Waits for Auth, then syncs)
+            onSnapshot(getPublicDoc('portal_settings', 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     state.announcement = data.announcement || '';
@@ -1309,8 +1276,8 @@
                 loadedSettings = true; checkInitialLoadComplete();
             });
 
-            // Listen to Teachers (Instantly loads from Cache, then syncs to Cloud)
-            onSnapshot(collection(db, getColPath('portal_teachers')), (querySnapshot) => {
+            // Listen to Teachers
+            onSnapshot(getPublicCollection('portal_teachers'), (querySnapshot) => {
                 state.teachers = [];
                 querySnapshot.forEach((doc) => {
                     state.teachers.push({ id: doc.id, ...doc.data() });
@@ -1330,8 +1297,8 @@
                 loadedTeachers = true; checkInitialLoadComplete();
             });
 
-            // Listen to Events (Instantly loads from Cache, then syncs to Cloud)
-            onSnapshot(collection(db, getColPath('portal_events')), (querySnapshot) => {
+            // Listen to Events
+            onSnapshot(getPublicCollection('portal_events'), (querySnapshot) => {
                 state.events = [];
                 querySnapshot.forEach((doc) => {
                     state.events.push({ id: doc.id, ...doc.data() });
@@ -1346,10 +1313,37 @@
             });
         }
 
+        // --- Auth Initialization ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                showFirebaseErrorBanner(error);
+            }
+        };
+
+        // Call auth first
+        initAuth();
+
+        // Listen for auth state change to trigger database listeners
+        let listenersSetup = false;
+        onAuthStateChanged(auth, (user) => {
+            if (user && !listenersSetup) {
+                listenersSetup = true;
+                setupRealtimeListeners(user);
+            }
+        });
+
         // Firebase Write Operations
         async function fbSaveSettings() {
+            if (!auth.currentUser) return;
             try {
-                await setDoc(doc(db, getColPath('portal_settings'), 'main'), {
+                await setDoc(getPublicDoc('portal_settings', 'main'), {
                     announcement: state.announcement,
                     menu: state.menu,
                     driveLinks: state.driveLinks,
@@ -1363,39 +1357,45 @@
         }
 
         async function fbAddTeacher(teacherData) {
+            if (!auth.currentUser) return;
             try {
-                await addDoc(collection(db, getColPath('portal_teachers')), teacherData);
+                await addDoc(getPublicCollection('portal_teachers'), teacherData);
             } catch (e) { console.error("Error adding teacher", e); alert("Failed to add. Image might be too large."); }
         }
 
         async function fbUpdateTeacher(id, teacherData) {
+            if (!auth.currentUser) return;
             try {
-                await updateDoc(doc(db, getColPath('portal_teachers'), id), teacherData);
+                await updateDoc(getPublicDoc('portal_teachers', id), teacherData);
             } catch (e) { console.error("Error updating teacher", e); alert("Failed to update."); }
         }
 
         async function fbDeleteTeacher(id) {
+            if (!auth.currentUser) return;
             try {
-                await deleteDoc(doc(db, getColPath('portal_teachers'), id));
+                await deleteDoc(getPublicDoc('portal_teachers', id));
             } catch (e) { console.error("Error deleting teacher", e); }
         }
 
         async function fbUpdateTeacherOrder() {
+            if (!auth.currentUser) return;
             // Bulk update order
             state.teachers.forEach((t, idx) => {
-                updateDoc(doc(db, getColPath('portal_teachers'), t.id), { order: idx }).catch(e=>{});
+                updateDoc(getPublicDoc('portal_teachers', t.id), { order: idx }).catch(e=>{});
             });
         }
 
         async function fbAddEvent(eventData) {
+            if (!auth.currentUser) return;
             try {
-                await addDoc(collection(db, getColPath('portal_events')), eventData);
+                await addDoc(getPublicCollection('portal_events'), eventData);
             } catch (e) { console.error(e); }
         }
 
         async function fbDeleteEvent(id) {
+            if (!auth.currentUser) return;
             try {
-                await deleteDoc(doc(db, getColPath('portal_events'), id));
+                await deleteDoc(getPublicDoc('portal_events', id));
             } catch (e) { console.error(e); }
         }
 
@@ -2487,7 +2487,6 @@
             setInterval(updateCountdown, 1000); 
         }
 
-        initFirebase();
         initCountdown();
     </script>
 </body>
