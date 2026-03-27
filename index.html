@@ -1835,7 +1835,7 @@
             alert("Announcement Saved!");
         };
 
-        // IMAGE COMPRESSION ENGINE - Optimized for 100+ Staff Payload
+        // IMAGE COMPRESSION ENGINE - Optimized for High Quality
         window.processImageUpload = function(event, stateKey, previewImgId, maxWidth = 800) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1848,22 +1848,22 @@
                     const ctx = canvas.getContext('2d');
                     let width = img.width; let height = img.height;
                     
-                    // ULTRA-LIGHT COMPRESSION LOGIC to prevent Database freezing
+                    // HIGH QUALITY LOGIC: Retain good resolution while preventing database crashes
                     if (stateKey === 'heroBgImageState') {
-                         if (width > 1200) { height *= 1200 / width; width = 1200; }
+                         if (width > 1600) { height *= 1600 / width; width = 1600; }
                     } else if (stateKey === 'logoImageState') {
-                         if (width > 200) { height *= 200 / width; width = 200; }
+                         if (width > 400) { height *= 400 / width; width = 400; }
                     } else {
-                         // Teacher Profile Photos - Make them tiny avatars to save massive space!
-                         if (width > 150) { height *= 150 / width; width = 150; } 
+                         // Teacher Profile Photos - Keep high resolution (800px) so it's not pixelated!
+                         if (width > 800) { height *= 800 / width; width = 800; } 
                     }
                     
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Force JPEG with 60% quality (0.6) for massive space savings as requested
+                    // Force JPEG with 85% high quality (0.85) for crisp images
                     let fileType = 'image/jpeg';
-                    let compression = 0.6; 
+                    let compression = 0.85; 
                     
                     if (stateKey === 'logoImageState') {
                         fileType = 'image/png'; // Only logo gets PNG for transparency
